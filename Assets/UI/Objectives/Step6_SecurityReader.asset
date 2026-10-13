@@ -1,0 +1,18 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f8df6cc2bad21be4abaf27c683a071e7, type: 3}
+  m_Name: Step6_SecurityReader
+  m_EditorClassIdentifier: Assembly-CSharp::EscapeRoom.Core.ObjectiveStep
+  stepTitle: Security Reader
+  instruction: Use the keycard on the security reader to reach the cellar.
+  completionFlag: CELLAR_UNLOCKED
+  roomIdentifier: Cellar

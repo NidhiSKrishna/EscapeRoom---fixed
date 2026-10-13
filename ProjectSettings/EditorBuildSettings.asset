@@ -1,0 +1,32 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!1045 &1
+EditorBuildSettings:
+  m_ObjectHideFlags: 0
+  serializedVersion: 2
+  m_Scenes:
+  - enabled: 1
+    path: Assets/Scenes/MainMenu.unity
+    guid: 1c70b86523aed024db4ad5873ad7730e
+  - enabled: 1
+    path: Assets/Scenes/EscapeRoom_Main.unity
+    guid: e5c1a84f37924610b89e7a90f1423851
+  - enabled: 1
+    path: Assets/Scenes/StorageRoom.unity
+    guid: 94abfd2c6de3ee2428a0bb6e2d8ad1a3
+  - enabled: 1
+    path: Assets/Scenes/SecurityControlRoom.unity
+    guid: 1ab3bd965ea0b324f92a2ba84da8f8df
+  - enabled: 1
+    path: Assets/Scenes/VaultCellar.unity
+    guid: ea62cd39f0ffa6540a1e9f96715c02c0
+  - enabled: 1
+    path: Assets/Scenes/FinalControlRoom.unity
+    guid: 477da9a3b6b66284f98d8a7fe00615c5
+  - enabled: 0
+    path: Assets/Scenes/SampleScene.unity
+    guid: 99c9720ab356a0642a771bea13969a05
+  m_configObjects:
+    com.unity.dt.app-ui: {fileID: 11400000, guid: 1b1c20d82303e4b5781c3ef50ac1449f, type: 2}
+    com.unity.input.settings.actions: {fileID: -944628639613478452, guid: 052faaac586de48259a63d0c4782560b, type: 3}
+  m_UseUCBPForAssetBundles: 0
