@@ -239,12 +239,12 @@ namespace EscapeRoom.Interaction
             float panelX = (Screen.width - panelWidth) * 0.5f;
             float panelY = (Screen.height - panelHeight) * 0.5f;
 
-            // 2. Outer golden accent border frame
-            GUI.color = new Color(0.85f, 0.72f, 0.35f, 1.0f);
+            // 2. Outer accent border frame (dark steel cyan)
+            GUI.color = new Color(0.25f, 0.36f, 0.52f, 1.0f);
             GUI.DrawTexture(new Rect(panelX, panelY, panelWidth, panelHeight), Texture2D.whiteTexture);
 
-            // 3. Document card background (solid dark slate, high contrast)
-            GUI.color = new Color(0.11f, 0.12f, 0.16f, 1.0f);
+            // 3. Document card background (deep obsidian slate)
+            GUI.color = new Color(0.08f, 0.09f, 0.12f, 1.0f);
             GUI.DrawTexture(new Rect(panelX + 3, panelY + 3, panelWidth - 6, panelHeight - 6), Texture2D.whiteTexture);
 
             // 4. Header title: Exit Code Note
@@ -259,7 +259,7 @@ namespace EscapeRoom.Interaction
             GUI.Label(new Rect(panelX + 20, panelY + 18, panelWidth - 40, 30), clueTitle, titleStyle);
 
             // 5. Divider line
-            GUI.color = new Color(0.85f, 0.72f, 0.35f, 0.50f);
+            GUI.color = new Color(0.25f, 0.36f, 0.52f, 0.50f);
             GUI.DrawTexture(new Rect(panelX + 24, panelY + 52, panelWidth - 48, 2), Texture2D.whiteTexture);
 
             // 6. Label: Emergency exit keypad code:
@@ -311,10 +311,12 @@ namespace EscapeRoom.Interaction
                 normal = { textColor = Color.white }
             };
 
+            GUI.backgroundColor = new Color(0.18f, 0.24f, 0.34f, 1f);
             if (GUI.Button(new Rect(btnX, btnY, btnWidth, btnHeight), "Close Note (ESC / E)", btnStyle))
             {
                 CloseClue();
             }
+            GUI.backgroundColor = Color.white;
 
             GUI.color = oldColor;
         }

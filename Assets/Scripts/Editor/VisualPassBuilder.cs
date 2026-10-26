@@ -382,18 +382,18 @@ namespace EscapeRoom.Editor
 
             MaterialPalette p = new MaterialPalette();
 
-            p.Wall = ConfigureLitMaterial("M_Proto_Wall", new Color(0.84f, 0.83f, 0.80f), 0.15f, 0.0f, wallTex, new Vector2(3f, 2f));
-            p.Floor = ConfigureLitMaterial("M_Proto_Floor", new Color(0.42f, 0.44f, 0.46f), 0.35f, 0.05f, floorTex, new Vector2(4f, 6f));
-            p.Ceiling = ConfigureLitMaterial("M_Proto_Ceiling", new Color(0.18f, 0.19f, 0.22f), 0.10f, 0.0f, null, Vector2.one);
-            p.Wood = ConfigureLitMaterial("M_Proto_Wood", new Color(0.52f, 0.36f, 0.22f), 0.35f, 0.0f, woodTex, new Vector2(2f, 2f));
-            p.DarkWood = ConfigureLitMaterial("M_Proto_DarkWood", new Color(0.24f, 0.16f, 0.10f), 0.40f, 0.0f, woodTex, new Vector2(2f, 2f));
-            p.Metal = ConfigureLitMaterial("M_Proto_Metal", new Color(0.42f, 0.45f, 0.48f), 0.65f, 0.85f, metalTex, new Vector2(2f, 2f));
-            p.Crate = ConfigureLitMaterial("M_Proto_Crate", new Color(0.65f, 0.50f, 0.35f), 0.20f, 0.0f, crateTex, new Vector2(1f, 1f));
-            p.Door = ConfigureLitMaterial("M_Proto_Door", new Color(0.25f, 0.28f, 0.30f), 0.45f, 0.70f, metalTex, new Vector2(1f, 2f));
-            p.Trim = ConfigureLitMaterial("M_Proto_Trim", new Color(0.28f, 0.22f, 0.16f), 0.30f, 0.05f, woodTex, new Vector2(1f, 4f));
+            p.Wall = ConfigureLitMaterial("M_Proto_Wall", new Color(0.12f, 0.13f, 0.16f), 0.15f, 0.0f, wallTex, new Vector2(3f, 2f));
+            p.Floor = ConfigureLitMaterial("M_Proto_Floor", new Color(0.10f, 0.11f, 0.13f), 0.30f, 0.05f, floorTex, new Vector2(4f, 6f));
+            p.Ceiling = ConfigureLitMaterial("M_Proto_Ceiling", new Color(0.05f, 0.06f, 0.07f), 0.05f, 0.0f, null, Vector2.one);
+            p.Wood = ConfigureLitMaterial("M_Proto_Wood", new Color(0.18f, 0.13f, 0.09f), 0.30f, 0.0f, woodTex, new Vector2(2f, 2f));
+            p.DarkWood = ConfigureLitMaterial("M_Proto_DarkWood", new Color(0.10f, 0.07f, 0.05f), 0.35f, 0.0f, woodTex, new Vector2(2f, 2f));
+            p.Metal = ConfigureLitMaterial("M_Proto_Metal", new Color(0.22f, 0.24f, 0.28f), 0.65f, 0.85f, metalTex, new Vector2(2f, 2f));
+            p.Crate = ConfigureLitMaterial("M_Proto_Crate", new Color(0.20f, 0.16f, 0.12f), 0.15f, 0.0f, crateTex, new Vector2(1f, 1f));
+            p.Door = ConfigureLitMaterial("M_Proto_Door", new Color(0.12f, 0.13f, 0.16f), 0.45f, 0.70f, metalTex, new Vector2(1f, 2f));
+            p.Trim = ConfigureLitMaterial("M_Proto_Trim", new Color(0.12f, 0.10f, 0.08f), 0.25f, 0.05f, woodTex, new Vector2(1f, 4f));
 
             // Emissive lamp bulb material
-            p.GlassOrLightEmissive = ConfigureLitMaterial("M_Proto_LightEmissive", new Color(1.0f, 0.95f, 0.85f), 0.85f, 0.1f, null, Vector2.one, new Color(1.0f, 0.92f, 0.75f) * 2.5f);
+            p.GlassOrLightEmissive = ConfigureLitMaterial("M_Proto_LightEmissive", new Color(1.0f, 0.85f, 0.60f), 0.85f, 0.1f, null, Vector2.one, new Color(2.2f, 1.6f, 0.8f));
 
             AssetDatabase.SaveAssets();
             return p;
@@ -773,7 +773,7 @@ namespace EscapeRoom.Editor
 
             // 2. Configure dark cool slate ambient lighting
             RenderSettings.ambientMode = AmbientMode.Flat;
-            RenderSettings.ambientLight = new Color(0.06f, 0.07f, 0.09f, 1.0f);
+            RenderSettings.ambientLight = new Color(0.025f, 0.030f, 0.045f, 1.0f);
 
             // 3. Primary Practical Ceiling Fixture Light
             // Positioned right under the ceiling fixture lamp (0.0, 3.15, 0.0)
@@ -866,9 +866,9 @@ namespace EscapeRoom.Editor
                 vignette = profile.Add<Vignette>(true);
             }
             vignette.intensity.overrideState = true;
-            vignette.intensity.value = 0.28f;
+            vignette.intensity.value = 0.38f;
             vignette.smoothness.overrideState = true;
-            vignette.smoothness.value = 0.35f;
+            vignette.smoothness.value = 0.40f;
 
             // 3. Bloom (Subtle glow around practical lights, no blinding blur)
             if (!profile.TryGet<Bloom>(out var bloom))
@@ -876,9 +876,9 @@ namespace EscapeRoom.Editor
                 bloom = profile.Add<Bloom>(true);
             }
             bloom.threshold.overrideState = true;
-            bloom.threshold.value = 0.95f;
+            bloom.threshold.value = 0.90f;
             bloom.intensity.overrideState = true;
-            bloom.intensity.value = 0.20f;
+            bloom.intensity.value = 0.35f;
             bloom.scatter.overrideState = true;
             bloom.scatter.value = 0.5f;
 
@@ -888,11 +888,11 @@ namespace EscapeRoom.Editor
                 colorAdj = profile.Add<ColorAdjustments>(true);
             }
             colorAdj.postExposure.overrideState = true;
-            colorAdj.postExposure.value = 0.22f;
+            colorAdj.postExposure.value = -0.10f;
             colorAdj.contrast.overrideState = true;
-            colorAdj.contrast.value = 14f;
+            colorAdj.contrast.value = 18f;
             colorAdj.saturation.overrideState = true;
-            colorAdj.saturation.value = 5f;
+            colorAdj.saturation.value = 6f;
 
             UnityEditor.EditorUtility.SetDirty(profile);
             AssetDatabase.SaveAssets();

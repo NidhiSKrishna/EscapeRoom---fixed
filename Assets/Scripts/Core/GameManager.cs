@@ -75,8 +75,11 @@ namespace EscapeRoom.Core
             hasEscaped = true;
             isGameplayActive = false;
 
+            // Play celebratory level exit sound
+            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.LevelExit);
+
             Debug.Log("<color=#5cb85c><b>[GameManager]</b></color> Escape Completed! Player reached the exit.");
-            FeedbackHUD.ShowMessage("ESCAPE SUCCESSFUL! You solved the escape room.", new Color(0.35f, 0.95f, 0.95f));
+            FeedbackHUD.ShowMessage("ESCAPE SUCCESSFUL! You solved the escape room.", Color.white);
 
             // Unlock Stage 2 progress
             GameProgress.SetStageUnlocked(2);

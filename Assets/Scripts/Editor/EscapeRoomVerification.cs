@@ -252,14 +252,18 @@ namespace EscapeRoom.Editor
                     EditorUtility.SetDirty(container);
                 }
 
-                if (container.RequiredItemId == PuzzleBuilder.DefaultKeyId && container.RequiredItemName == PuzzleBuilder.DefaultKeyName)
+                Transform lidSlab = container.transform.Find("Lockbox_LidHinge/Lockbox_LidSlab");
+                bool lidNonStatic = lidSlab != null && GameObjectUtility.GetStaticEditorFlags(lidSlab.gameObject) == 0;
+                bool lidHingeConfigured = container.LidTransform != null && container.OpenRotationOffset.x > 80f;
+
+                if (container.RequiredItemId == PuzzleBuilder.DefaultKeyId && container.RequiredItemName == PuzzleBuilder.DefaultKeyName && lidNonStatic && lidHingeConfigured)
                 {
-                    Debug.Log($"<color=#5cb85c>[PASS]</color> Exactly one LockedContainer exists: '{container.gameObject.name}', locked: {container.IsLocked}, requires key: '{container.RequiredItemId}' ('{container.RequiredItemName}'), prompt: '{container.InteractionPrompt}'.");
+                    Debug.Log($"<color=#5cb85c>[PASS]</color> Exactly one LockedContainer exists: '{container.gameObject.name}', locked: {container.IsLocked}, requires key: '{container.RequiredItemId}', lid hinge dynamic rotation ({container.OpenRotationOffset}) verified, LidSlab non-static: {lidNonStatic}.");
                     passCount++;
                 }
                 else
                 {
-                    Debug.LogError($"<color=#d9534f>[FAIL]</color> LockedContainer '{container.gameObject.name}' requires '{container.RequiredItemId}', expected '{PuzzleBuilder.DefaultKeyId}'.");
+                    Debug.LogError($"<color=#d9534f>[FAIL]</color> LockedContainer '{container.gameObject.name}' configuration mismatch: Key: '{container.RequiredItemId}', LidHingeConfigured: {lidHingeConfigured}, LidNonStatic: {lidNonStatic}.");
                 }
             }
             else if (containers.Length == 0)
@@ -329,14 +333,15 @@ namespace EscapeRoom.Editor
             if (keypads.Length == 1)
             {
                 KeypadController keypad = keypads[0];
-                if (!string.IsNullOrEmpty(keypad.TargetCode))
+                bool isFourDigits = !string.IsNullOrEmpty(keypad.TargetCode) && keypad.TargetCode.Length == 4 && int.TryParse(keypad.TargetCode, out _);
+                if (isFourDigits)
                 {
-                    Debug.Log($"<color=#5cb85c>[PASS]</color> Exactly one KeypadController exists: '{keypad.gameObject.name}' with configurable target code (length {keypad.TargetCode.Length}).");
+                    Debug.Log($"<color=#5cb85c>[PASS]</color> Exactly one KeypadController exists: '{keypad.gameObject.name}' with randomized 4-digit passcode '{keypad.TargetCode}' (up to 9999).");
                     passCount++;
                 }
                 else
                 {
-                    Debug.LogError($"<color=#d9534f>[FAIL]</color> KeypadController '{keypad.gameObject.name}' has empty target code!");
+                    Debug.LogError($"<color=#d9534f>[FAIL]</color> KeypadController '{keypad.gameObject.name}' has invalid passcode '{keypad.TargetCode}' (expected 4 digits up to 9999)!");
                 }
             }
             else if (keypads.Length == 0)
@@ -348,7 +353,7 @@ namespace EscapeRoom.Editor
                 Debug.LogError($"<color=#d9534f>[FAIL]</color> Duplicate KeypadControllers detected: {keypads.Length} found.");
             }
 
-            // 14. Exit Door Existence and Unlock Workflow Check
+            // 14. Exit Door Existence, Hinge Rotation and Unlock Workflow Check
             totalCount++;
             DoorController[] doors = Object.FindObjectsByType<DoorController>(FindObjectsSortMode.None);
             if (doors.Length == 1)
@@ -356,10 +361,13 @@ namespace EscapeRoom.Editor
                 DoorController door = doors[0];
                 bool linkedDirectly = keypads.Length > 0 && keypads[0].LinkedDoor == door;
                 bool hasEventListener = keypads.Length > 0 && keypads[0].onCodeAccepted.GetPersistentEventCount() > 0;
+                Transform doorSlab = door.transform.Find("Door_Slab");
+                bool slabNonStatic = doorSlab != null && GameObjectUtility.GetStaticEditorFlags(doorSlab.gameObject) == 0;
+                bool hingeConfigured = door.HingeTransform != null && door.OpenEulerAngles.y < -80f;
 
-                if (door.IsLocked && (linkedDirectly || hasEventListener))
+                if (door.IsLocked && (linkedDirectly || hasEventListener) && slabNonStatic && hingeConfigured)
                 {
-                    Debug.Log($"<color=#5cb85c>[PASS]</color> Exit Door verified: '{door.gameObject.name}' starts locked, animation duration: {door.AnimationDuration}s, unlock workflow connected: (DirectLink: {linkedDirectly}, EventListener: {hasEventListener}).");
+                    Debug.Log($"<color=#5cb85c>[PASS]</color> Exit Door verified: '{door.gameObject.name}' starts locked, hinge rotation ({door.OpenEulerAngles}) verified, Door_Slab non-static: {slabNonStatic}, animation duration: {door.AnimationDuration}s, unlock workflow connected: (DirectLink: {linkedDirectly}, EventListener: {hasEventListener}).");
                     passCount++;
                 }
                 else if (!door.IsLocked)
@@ -369,7 +377,7 @@ namespace EscapeRoom.Editor
                 }
                 else
                 {
-                    Debug.LogError($"<color=#d9534f>[FAIL]</color> Exit Door '{door.gameObject.name}' has no unlock workflow connected from Keypad!");
+                    Debug.LogError($"<color=#d9534f>[FAIL]</color> Exit Door '{door.gameObject.name}' mismatch: WorkflowConnected: {(linkedDirectly || hasEventListener)}, SlabNonStatic: {slabNonStatic}, HingeConfigured: {hingeConfigured}!");
                 }
             }
             else if (doors.Length == 0)

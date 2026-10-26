@@ -191,7 +191,7 @@ namespace EscapeRoom.UI
             var statusStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 13, alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = isShowingSequence ? new Color(0.95f, 0.85f, 0.25f) : new Color(0.35f, 0.95f, 0.45f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(px + 10, py + 44, pw - 20, 22), statusText, statusStyle);
 
@@ -202,7 +202,8 @@ namespace EscapeRoom.UI
 
             var btnStyle = new GUIStyle(GUI.skin.button)
             {
-                fontSize = 16, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter
+                fontSize = 16, fontStyle = FontStyle.Bold, alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
             };
 
             for (int i = 0; i < 4; i++)

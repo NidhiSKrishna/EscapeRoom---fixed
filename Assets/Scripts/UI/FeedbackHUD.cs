@@ -83,7 +83,7 @@ namespace EscapeRoom.UI
                 fontSize = 15,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(currentMessageColor.r, currentMessageColor.g, currentMessageColor.b, alpha) }
+                normal = { textColor = new Color(1f, 1f, 1f, alpha) }
             };
 
             Vector2 size = style.CalcSize(content);

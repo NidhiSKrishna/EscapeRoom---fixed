@@ -26,12 +26,12 @@ namespace EscapeRoom.Stage3.UI
                 if (puzzle.IsCompleted)
                 {
                     screenText.text = "TERMINAL OVERRIDE:\n[ACCESS GRANTED]";
-                    screenText.color = new Color(0.35f, 0.95f, 0.35f);
+                    screenText.color = Color.white;
                 }
                 else
                 {
                     screenText.text = $"SECURITY EQUATION:\n{puzzle.EquationDisplay}";
-                    screenText.color = new Color(0.95f, 0.85f, 0.35f);
+                    screenText.color = Color.white;
                 }
             }
         }

@@ -216,7 +216,7 @@ namespace EscapeRoom.Stage3
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.70f, 0.90f, 1.0f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 10, winY + 38, winW - 20, 20f), "ALL LOCKS DISARMED // PROCEEDING TO FINAL CONTROL ROOM", subStyle);
 
@@ -232,7 +232,7 @@ namespace EscapeRoom.Stage3
                 fontSize = 14,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.black }
+                normal = { textColor = Color.white }
             };
 
             GUI.backgroundColor = new Color(0.25f, 0.88f, 0.45f);

@@ -167,7 +167,7 @@ namespace EscapeRoom.UI
             {
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = new Color(0.95f, 0.90f, 0.70f) }
+                normal = { textColor = Color.white }
             };
 
             GUI.color = Color.white;
@@ -207,7 +207,7 @@ namespace EscapeRoom.UI
             {
                 fontSize = 11,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.60f, 0.65f, 0.70f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(phoneX + 15, phoneY + 26, phoneW - 30, 20), "02:47 AM  •  ENCRYPTED CELLULAR", statusStyle);
 
@@ -231,7 +231,7 @@ namespace EscapeRoom.UI
                 fontSize = 15,
                 wordWrap = true,
                 alignment = TextAnchor.UpperLeft,
-                normal = { textColor = new Color(0.92f, 0.95f, 0.98f) }
+                normal = { textColor = Color.white }
             };
 
             string currentText = (storyMessages != null && currentMessageIndex < storyMessages.Length)
@@ -246,7 +246,7 @@ namespace EscapeRoom.UI
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.60f, 0.65f, 0.70f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(phoneX + 20, phoneY + phoneH - 96, phoneW - 40, 20),
                 $"Message {currentMessageIndex + 1} of {totalSlides}", pageStyle);
@@ -264,10 +264,10 @@ namespace EscapeRoom.UI
                 fontSize = 14,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.black }
+                normal = { textColor = Color.white }
             };
 
-            GUI.backgroundColor = new Color(0.95f, 0.80f, 0.25f, 1f);
+            GUI.backgroundColor = new Color(0.18f, 0.28f, 0.45f, 1f);
             if (GUI.Button(nextBtnRect, btnLabel, nextStyle))
             {
                 OnNextClicked();

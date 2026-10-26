@@ -198,7 +198,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 11,
                 fontStyle = FontStyle.Normal,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.60f, 0.80f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 16, winY + 44, winW - 32, 20f), "DOCUMENT CLASSIFICATION: RESTRICTED // INTERNAL FACILITY LOG", subTitleStyle);
 
@@ -210,7 +210,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = new Color(0.40f, 0.90f, 1.0f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 24, curY, winW - 48, 20f), "► FACILITY DIRECTIVE & CIPHER MEMO:", sectionHeaderStyle);
             curY += 22f;
@@ -260,13 +260,13 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = new Color(1.0f, 0.85f, 0.25f) }
+                normal = { textColor = Color.white }
             };
             var locStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 11,
                 fontStyle = FontStyle.Italic,
-                normal = { textColor = new Color(0.75f, 0.90f, 0.85f) }
+                normal = { textColor = Color.white }
             };
 
             GUI.color = Color.white;

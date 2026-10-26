@@ -280,7 +280,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.75f, 0.95f, 0.80f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 10, winY + 38, winW - 20, 20f), "SECTOR ACCESS BADGE ACQUIRED // EVACUATION PASSAGE OPEN", subStyle);
 
@@ -320,7 +320,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 14,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleRight,
-                normal = { textColor = new Color(0.98f, 0.90f, 0.35f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 45, curY + 144, winW - 90, 24f), $"EVALUATION: {completionRating}", rankStyle);
 

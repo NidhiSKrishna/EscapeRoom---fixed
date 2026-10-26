@@ -110,12 +110,12 @@ namespace EscapeRoom.Editor
             GameObject propsContainer = CreateSubContainer(PropsContainerName, root.transform);
 
             // Fetch or create prototype materials
-            Material floorMat = GetOrCreateMaterial("M_Proto_Floor", new Color(0.42f, 0.44f, 0.46f), 0.25f);
-            Material wallMat = GetOrCreateMaterial("M_Proto_Wall", new Color(0.85f, 0.84f, 0.81f), 0.15f);
-            Material ceilingMat = GetOrCreateMaterial("M_Proto_Ceiling", new Color(0.24f, 0.25f, 0.27f), 0.10f);
-            Material frameMat = GetOrCreateMaterial("M_Proto_DoorFrame", new Color(0.18f, 0.19f, 0.20f), 0.35f, 0.20f);
-            Material woodMat = GetOrCreateMaterial("M_Proto_Wood", new Color(0.45f, 0.30f, 0.18f), 0.30f);
-            Material crateMat = GetOrCreateMaterial("M_Proto_Crate", new Color(0.64f, 0.50f, 0.34f), 0.20f);
+            Material floorMat = GetOrCreateMaterial("M_Proto_Floor", new Color(0.10f, 0.11f, 0.13f), 0.30f, 0.05f);
+            Material wallMat = GetOrCreateMaterial("M_Proto_Wall", new Color(0.12f, 0.13f, 0.16f), 0.15f, 0.0f);
+            Material ceilingMat = GetOrCreateMaterial("M_Proto_Ceiling", new Color(0.05f, 0.06f, 0.07f), 0.05f, 0.0f);
+            Material frameMat = GetOrCreateMaterial("M_Proto_DoorFrame", new Color(0.08f, 0.09f, 0.11f), 0.35f, 0.30f);
+            Material woodMat = GetOrCreateMaterial("M_Proto_Wood", new Color(0.18f, 0.13f, 0.09f), 0.30f, 0.0f);
+            Material crateMat = GetOrCreateMaterial("M_Proto_Crate", new Color(0.20f, 0.16f, 0.12f), 0.15f, 0.0f);
 
             // 1. Build Architecture (Floor, Ceiling, Walls, Doorway/Frame)
             BuildArchitecture(config, archContainer.transform, floorMat, wallMat, ceilingMat, frameMat);

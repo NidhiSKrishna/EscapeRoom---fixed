@@ -74,9 +74,9 @@ namespace EscapeRoom.Editor
         [Header("Optional Environment Light")]
         [Tooltip("Add prototype interior point light to illuminate the room")]
         public bool includeCeilingLight = true;
-        public Color ceilingLightColor = new Color(1.0f, 0.95f, 0.88f);
-        public float ceilingLightIntensity = 400.0f;
-        public float ceilingLightRange = 15.0f;
+        public Color ceilingLightColor = new Color(1.0f, 0.82f, 0.60f);
+        public float ceilingLightIntensity = 55.0f;
+        public float ceilingLightRange = 14.0f;
 
         /// <summary>
         /// Creates the official prototype specification:

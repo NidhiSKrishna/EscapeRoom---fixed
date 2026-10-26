@@ -74,10 +74,16 @@ namespace EscapeRoom.Core
 
         public void EnsureInitialized()
         {
-            if (!isInitialized || string.IsNullOrEmpty(level1Passcode))
+            if (!isInitialized || string.IsNullOrEmpty(level1Passcode) || level1Passcode == "8431" || level1Passcode == "4719")
             {
                 GenerateNewPlaythroughValues();
             }
+        }
+
+        public void RegenerateLevel1Passcode()
+        {
+            level1Passcode = UnityEngine.Random.Range(1000, 10000).ToString("D4");
+            OnPlaythroughStateInitialized?.Invoke();
         }
 
         /// <summary>
@@ -85,8 +91,8 @@ namespace EscapeRoom.Core
         /// </summary>
         public void GenerateNewPlaythroughValues()
         {
-            // Level 1 Passcode (fixed to 8431 per Stage 1 specification)
-            level1Passcode = "8431";
+            // Level 1 Passcode (randomized 4-digit code up to 9999)
+            level1Passcode = UnityEngine.Random.Range(1000, 10000).ToString("D4");
 
             // Level 2 Symbol & Passcode
             int code2 = UnityEngine.Random.Range(100, 1000);

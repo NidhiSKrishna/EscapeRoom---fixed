@@ -127,11 +127,11 @@ namespace EscapeRoom.UI
             GUI.color = new Color(1f, 1f, 1f, alpha);
 
             // Title
-            titleStyle.normal.textColor = new Color(0.90f, 0.30f, 0.30f, alpha);
+            titleStyle.normal.textColor = new Color(1f, 1f, 1f, alpha);
             GUI.Label(new Rect(px + 10, py + 18, pw - 20, 46), "TIME EXPIRED", titleStyle);
 
             // Cipher body
-            bodyStyle.normal.textColor = new Color(0.85f, 0.90f, 0.95f, alpha);
+            bodyStyle.normal.textColor = new Color(1f, 1f, 1f, alpha);
             GUI.Label(new Rect(px + 30, py + 74, pw - 60, 24), "CIPHER:", bodyStyle);
             GUI.Label(new Rect(px + 30, py + 98, pw - 60, 24), "\"We ran out of time. Let's try that again.\"", bodyStyle);
 

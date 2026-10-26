@@ -438,7 +438,7 @@ namespace EscapeRoom.Stage3.Puzzles
                 fontSize = 20,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.98f, 0.85f, 0.25f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 20, cardY + 18, cardW - 40, 30), "SYMBOL TERMINAL", titleStyle);
 
@@ -457,7 +457,7 @@ namespace EscapeRoom.Stage3.Puzzles
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.70f, 0.75f, 0.80f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 20, cardY + 110, cardW - 40, 20),
                 "Decode each symbol's value and enter the 4-digit number", instrStyle);
@@ -482,7 +482,7 @@ namespace EscapeRoom.Stage3.Puzzles
                 fontSize = 36,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.35f, 0.95f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 20, cardY + 160, cardW - 40, 50), displayCode.Trim(), codeStyle);
 
@@ -495,7 +495,8 @@ namespace EscapeRoom.Stage3.Puzzles
             {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
             };
 
             GUI.backgroundColor = new Color(0.25f, 0.28f, 0.35f);
@@ -557,7 +558,7 @@ namespace EscapeRoom.Stage3.Puzzles
             {
                 fontSize = 11,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.55f, 0.60f, 0.65f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 20, cardY + cardH - 35, cardW - 40, 20), "[ESC] to close", closeStyle);
 

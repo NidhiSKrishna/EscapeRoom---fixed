@@ -156,16 +156,16 @@ namespace EscapeRoom.UI
             float cardX = (Screen.width - cardWidth) * 0.5f;
             float cardY = (Screen.height - cardHeight) * 0.5f;
 
-            // Outer card frame
-            GUI.color = new Color(0.12f, 0.14f, 0.18f, 0.98f);
+            // Outer card frame (obsidian slate)
+            GUI.color = new Color(0.06f, 0.08f, 0.11f, 0.98f);
             GUI.Box(new Rect(cardX, cardY, cardWidth, cardHeight), GUIContent.none);
 
-            // Border accent
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.90f);
+            // Border accent (dark steel cyan)
+            GUI.color = new Color(0.24f, 0.32f, 0.45f, 0.90f);
             GUI.Box(new Rect(cardX + 3, cardY + 3, cardWidth - 6, cardHeight - 6), GUIContent.none);
 
-            // Card body background
-            GUI.color = new Color(0.14f, 0.16f, 0.22f, 1f);
+            // Card body background (deep slate)
+            GUI.color = new Color(0.09f, 0.11f, 0.15f, 1f);
             GUI.Box(new Rect(cardX + 5, cardY + 5, cardWidth - 10, cardHeight - 10), GUIContent.none);
 
             GUI.color = Color.white;
@@ -176,12 +176,12 @@ namespace EscapeRoom.UI
                 fontSize = 24,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.98f, 0.85f, 0.35f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 20, cardY + 20, cardWidth - 40, 36), briefingTitle, titleStyle);
 
             // Divider line
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.40f);
+            GUI.color = new Color(0.24f, 0.32f, 0.45f, 0.50f);
             GUI.DrawTexture(new Rect(cardX + 40, cardY + 62, cardWidth - 80, 2), Texture2D.whiteTexture);
             GUI.color = Color.white;
 
@@ -191,7 +191,7 @@ namespace EscapeRoom.UI
                 fontSize = 15,
                 alignment = TextAnchor.MiddleCenter,
                 wordWrap = true,
-                normal = { textColor = new Color(0.90f, 0.92f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 30, cardY + 75, cardWidth - 60, 70), briefingBody, bodyStyle);
 
@@ -201,7 +201,7 @@ namespace EscapeRoom.UI
             float boxW = cardWidth - 70;
             float boxH = 180;
 
-            GUI.color = new Color(0.08f, 0.10f, 0.14f, 0.90f);
+            GUI.color = new Color(0.05f, 0.06f, 0.09f, 0.95f);
             GUI.Box(new Rect(boxX, boxY, boxW, boxH), GUIContent.none);
             GUI.color = Color.white;
 
@@ -209,7 +209,7 @@ namespace EscapeRoom.UI
             {
                 fontSize = 13,
                 alignment = TextAnchor.UpperLeft,
-                normal = { textColor = new Color(0.80f, 0.88f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(boxX + 20, boxY + 12, boxW - 40, boxH - 24), controlsText, controlsStyle);
 
@@ -223,10 +223,10 @@ namespace EscapeRoom.UI
             {
                 fontSize = 16,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = Color.black }
+                normal = { textColor = Color.white }
             };
 
-            GUI.backgroundColor = new Color(0.98f, 0.82f, 0.25f, 1f);
+            GUI.backgroundColor = new Color(0.18f, 0.28f, 0.42f, 1f);
             Rect beginRect = new Rect(btnX, btnY, btnW, btnH);
             if (GUI.Button(beginRect, "BEGIN [ENTER / SPACE]", btnStyle))
             {

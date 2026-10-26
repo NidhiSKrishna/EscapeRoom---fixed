@@ -466,22 +466,24 @@ public class Stage4WirePuzzle : MonoBehaviour
         titleStyle.fontSize = 28;
         titleStyle.fontStyle = FontStyle.Bold;
         titleStyle.alignment = TextAnchor.MiddleCenter;
-        titleStyle.normal.textColor = new Color(1f, 0.65f, 0.2f);
+        titleStyle.normal.textColor = Color.white;
 
         textStyle = new GUIStyle(GUI.skin.label);
         textStyle.fontSize = 17;
         textStyle.alignment = TextAnchor.MiddleCenter;
-        textStyle.normal.textColor = new Color(0.8f, 0.9f, 1f);
+        textStyle.normal.textColor = Color.white;
 
         messageStyle = new GUIStyle(GUI.skin.label);
         messageStyle.fontSize = 22;
         messageStyle.fontStyle = FontStyle.Bold;
         messageStyle.alignment = TextAnchor.MiddleCenter;
+        messageStyle.normal.textColor = Color.white;
 
         terminalStyle = new GUIStyle(GUI.skin.button);
         terminalStyle.fontSize = 30;
         terminalStyle.fontStyle = FontStyle.Bold;
         terminalStyle.alignment = TextAnchor.MiddleCenter;
+        terminalStyle.normal.textColor = Color.white;
 
         smallStyle = new GUIStyle(GUI.skin.label);
         smallStyle.fontSize = 15;
@@ -556,8 +558,7 @@ public class Stage4WirePuzzle : MonoBehaviour
 
         if (!string.IsNullOrEmpty(message) && Time.unscaledTime < messageUntil)
         {
-            messageStyle.normal.textColor = completed ? new Color(0.3f, 1f, 0.5f)
-                : (message.StartsWith("SHORT") ? new Color(1f, 0.35f, 0.35f) : new Color(0.7f, 0.9f, 1f));
+            messageStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(r.x, r.y + 390f, w, 30f), message, messageStyle);
         }
 

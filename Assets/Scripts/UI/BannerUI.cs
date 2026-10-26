@@ -109,8 +109,8 @@ namespace EscapeRoom.UI
             GUI.color = new Color(0.04f, 0.06f, 0.09f, 0.80f * currentAlpha);
             GUI.Box(new Rect(bannerX, bannerY, bannerW, bannerH), GUIContent.none);
 
-            // Subtle top and bottom accent lines
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.70f * currentAlpha);
+            // Subtle top and bottom accent lines (cyan steel)
+            GUI.color = new Color(0.25f, 0.42f, 0.65f, 0.75f * currentAlpha);
             GUI.DrawTexture(new Rect(bannerX + 20, bannerY, bannerW - 40, 2), Texture2D.whiteTexture);
             GUI.DrawTexture(new Rect(bannerX + 20, bannerY + bannerH - 2, bannerW - 40, 2), Texture2D.whiteTexture);
 
@@ -131,7 +131,7 @@ namespace EscapeRoom.UI
                 fontSize = 14,
                 fontStyle = FontStyle.Italic,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(1.0f, 1.0f, 1.0f, currentAlpha * 0.9f) }
+                normal = { textColor = new Color(1.0f, 1.0f, 1.0f, currentAlpha) }
             };
             GUI.Label(new Rect(bannerX + 15, bannerY + 54, bannerW - 30, 40), currentTip, tipStyle);
 

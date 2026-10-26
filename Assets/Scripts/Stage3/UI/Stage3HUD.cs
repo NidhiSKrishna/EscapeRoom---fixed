@@ -114,8 +114,7 @@ namespace EscapeRoom.Stage3.UI
                 alignment = TextAnchor.MiddleLeft
             };
 
-            headerStyle.normal.textColor =
-                new Color(0.65f, 0.70f, 0.75f);
+            headerStyle.normal.textColor = Color.white;
 
             GUI.Label(
                 new Rect(panelX + 10, panelY + 6, panelW - 20, 16),
@@ -204,8 +203,7 @@ namespace EscapeRoom.Stage3.UI
 
             if (lockdownActive)
             {
-                statusStyle.normal.textColor =
-                    new Color(0.95f, 0.35f, 0.35f);
+                statusStyle.normal.textColor = Color.white;
 
                 GUI.Label(
                     new Rect(
@@ -245,11 +243,7 @@ namespace EscapeRoom.Stage3.UI
         {
             string prefix = completed ? "✓" : "○";
 
-            Color color = completed
-                ? new Color(0.40f, 0.90f, 0.45f)
-                : new Color(0.55f, 0.60f, 0.65f);
-
-            style.normal.textColor = color;
+            style.normal.textColor = Color.white;
 
             GUI.Label(
                 new Rect(x, y, w, h),

@@ -83,7 +83,7 @@ namespace EscapeRoom.Stage2
             if (!HasSecurityChip)
             {
                 Stage2Audio.Instance?.PlayWrongAnswer();
-                FeedbackHUD.ShowMessage("ACCESS DENIED: Pattern Terminal is locked. Find the Security Access Chip first! (Check Shift Log for clues)", new Color(0.95f, 0.35f, 0.35f));
+                FeedbackHUD.ShowMessage("ACCESS DENIED: Pattern Terminal is locked. Search any container, drawer, or shelf in the room to retrieve the Security Access Chip!", new Color(0.95f, 0.35f, 0.35f));
                 return;
             }
 
@@ -246,7 +246,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.70f, 0.75f, 0.80f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 10, winY + 34, winW - 20, 20f), $"SUBROUTINE: {pattern.puzzleTitle.ToUpper()} [{pattern.category.ToUpper()}]", subStyle);
 
@@ -263,7 +263,7 @@ namespace EscapeRoom.Stage2
                     fontSize = 17,
                     fontStyle = FontStyle.Bold,
                     alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = new Color(0.95f, 0.40f, 0.40f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.color = Color.white;
                 GUI.Label(new Rect(winX + 30, curY + 25, winW - 60, 30f), "🔒 ACCESS DENIED: SECURITY MODULE NOT DETECTED", lockTitle);
@@ -306,7 +306,7 @@ namespace EscapeRoom.Stage2
                 {
                     fontSize = 12,
                     alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = new Color(0.65f, 0.70f, 0.75f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.Label(new Rect(winX + 30, curY + 62, winW - 60, 24f), "Identify the logical pattern progression to determine the final missing element.", hintStyle);
 
@@ -360,7 +360,7 @@ namespace EscapeRoom.Stage2
                         fontSize = 13,
                         fontStyle = FontStyle.Bold,
                         alignment = TextAnchor.MiddleCenter,
-                        normal = { textColor = feedbackColor }
+                        normal = { textColor = Color.white }
                     };
                     GUI.Label(new Rect(winX + 24, curY, winW - 48, 26f), feedbackMessage, msgStyle);
                 }
@@ -376,7 +376,7 @@ namespace EscapeRoom.Stage2
                     fontSize = 16,
                     fontStyle = FontStyle.Bold,
                     alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = new Color(0.40f, 0.95f, 0.45f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.color = Color.white;
                 GUI.Label(new Rect(winX + 30, curY + 12, winW - 60, 26f), "✔ SEQUENCE RECOGNITION VALIDATED", successTitle);
@@ -385,7 +385,7 @@ namespace EscapeRoom.Stage2
                 {
                     fontSize = 12,
                     alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = new Color(0.85f, 0.90f, 0.85f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.Label(new Rect(winX + 30, curY + 38, winW - 60, 20f), $"Rule: {pattern.ruleExplanation}", explanationStyle);
 
@@ -403,7 +403,7 @@ namespace EscapeRoom.Stage2
                     fontSize = 20,
                     fontStyle = FontStyle.Bold,
                     alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = new Color(0.98f, 0.92f, 0.35f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.color = Color.white;
                 GUI.Label(new Rect(codeBoxX, codeBoxY, codeBoxW, codeBoxH), $"CONTAINER CODE: [ {puzzleGen.ContainerCombination} ]", codeStyle);
@@ -423,7 +423,7 @@ namespace EscapeRoom.Stage2
                     fontSize = 13,
                     wordWrap = true,
                     alignment = TextAnchor.MiddleCenter,
-                    normal = { textColor = new Color(0.80f, 0.85f, 0.90f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.Label(new Rect(winX + 40, curY + 150f, winW - 80, 55f), puzzleGen.ActiveSearchSpot.clueNote, clueBodyStyle);
 

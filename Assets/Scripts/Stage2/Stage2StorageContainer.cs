@@ -262,7 +262,11 @@ namespace EscapeRoom.Stage2
             }
 
             var gen = Stage2PuzzleGenerator.Instance;
-            if (gen != null && gen.ValidateContainerCode(enteredCode))
+            bool valid = (gen != null && gen.ValidateContainerCode(enteredCode)) ||
+                         (gen != null && string.Equals(gen.ContainerCombination.Trim(), enteredCode.Trim(), StringComparison.OrdinalIgnoreCase)) ||
+                         (EscapeRoom.Core.PlaythroughGameState.Instance != null && string.Equals(EscapeRoom.Core.PlaythroughGameState.Instance.Level2Passcode.Trim(), enteredCode.Trim(), StringComparison.OrdinalIgnoreCase));
+
+            if (valid)
             {
                 UnlockContainer();
             }
@@ -364,7 +368,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = statusColor }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 10, winY + 40, winW - 20, 20f), statusMessage, statusStyle);
 
@@ -391,7 +395,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 26,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.98f, 0.95f, 0.40f) }
+                normal = { textColor = Color.white }
             };
             GUI.color = Color.white;
             GUI.Label(new Rect(dispX, dispY, dispW, dispH), displayStr, dispStyle);

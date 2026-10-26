@@ -189,7 +189,7 @@ namespace EscapeRoom.UI
             var hintStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 12, alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.85f, 0.85f, 0.85f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(px + 20, py + 144, pw - 40, 44),
                 "Hint: Torn Note Cipher = IUHH\n(Each letter shifted +3 levels. Type answer & press ENTER)", hintStyle);

@@ -221,7 +221,7 @@ namespace EscapeRoom.Stage3.Puzzles
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.95f, 0.25f, 0.25f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cbX + 10, cbY + 12, countdownBoxW - 20, 25), "⚠ SECURITY LOCKDOWN ⚠", lockdownTitleStyle);
 
@@ -234,7 +234,7 @@ namespace EscapeRoom.Stage3.Puzzles
                 fontSize = 42,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(1f, 0.3f, 0.2f, pulseAlpha) }
+                normal = { textColor = new Color(1f, 1f, 1f, pulseAlpha) }
             };
             GUI.Label(new Rect(cbX + 10, cbY + 40, countdownBoxW - 20, 50), displayTime.ToString("F1") + "s", timerStyle);
 
@@ -244,7 +244,7 @@ namespace EscapeRoom.Stage3.Puzzles
                 fontSize = 12,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.95f, 0.80f, 0.20f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cbX + 10, cbY + countdownBoxH - 30, countdownBoxW - 20, 20),
                 "REACH THE CONTROL PANEL AND PRESS [E]", instrStyle);

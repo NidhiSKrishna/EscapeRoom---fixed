@@ -259,11 +259,11 @@ namespace EscapeRoom.UI
             GUI.color = Color.white;
 
             // "TIME" label
-            labelStyle.normal.textColor = new Color(0.65f, 0.70f, 0.75f);
+            labelStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(panelX + 10, panelY + 4, panelW - 14, 18), "TIME REMAINING", labelStyle);
 
             // Time value
-            timerStyle.normal.textColor = timeColor;
+            timerStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(panelX + 10, panelY + 20, panelW - 14, 28),
                       isExpired ? "00:00" : FormatTime(timeRemaining), timerStyle);
 

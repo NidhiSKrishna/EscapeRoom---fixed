@@ -343,7 +343,7 @@ public class Stage4CodePuzzle : MonoBehaviour
         titleStyle.fontSize = 24;
         titleStyle.fontStyle = FontStyle.Bold;
         titleStyle.alignment = TextAnchor.MiddleCenter;
-        titleStyle.normal.textColor = new Color(1f, 0.82f, 0.25f);
+        titleStyle.normal.textColor = Color.white;
 
         codeStyle = new GUIStyle(GUI.skin.box);
         codeStyle.fontSize = 36;
@@ -355,20 +355,23 @@ public class Stage4CodePuzzle : MonoBehaviour
         msgStyle.fontSize = 16;
         msgStyle.fontStyle = FontStyle.Bold;
         msgStyle.alignment = TextAnchor.MiddleCenter;
+        msgStyle.normal.textColor = Color.white;
 
         keyStyle = new GUIStyle(GUI.skin.button);
         keyStyle.fontSize = 24;
         keyStyle.fontStyle = FontStyle.Bold;
+        keyStyle.normal.textColor = Color.white;
 
         slotLabelStyle = new GUIStyle(GUI.skin.label);
         slotLabelStyle.fontSize = 12;
         slotLabelStyle.fontStyle = FontStyle.Bold;
         slotLabelStyle.alignment = TextAnchor.MiddleCenter;
-        slotLabelStyle.normal.textColor = new Color(0.65f, 0.8f, 0.95f);
+        slotLabelStyle.normal.textColor = Color.white;
 
         ctrlStyle = new GUIStyle(GUI.skin.button);
         ctrlStyle.fontSize = 16;
         ctrlStyle.fontStyle = FontStyle.Bold;
+        ctrlStyle.normal.textColor = Color.white;
     }
 
     private static readonly string[] SlotLabels = { "1 PATTERN", "2 LAST LIGHT", "3 PANEL NO.", "4 LAST WIRE" };
@@ -400,9 +403,7 @@ public class Stage4CodePuzzle : MonoBehaviour
         // Status message
         if (!string.IsNullOrEmpty(statusMessage))
         {
-            bool bad = statusMessage.StartsWith("ACCESS DENIED");
-            msgStyle.normal.textColor = solved ? new Color(0.3f, 1f, 0.45f)
-                : (bad ? new Color(1f, 0.35f, 0.35f) : new Color(1f, 0.85f, 0.35f));
+            msgStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(r.x, r.y + 144f, w, 28f), statusMessage, msgStyle);
         }
 

@@ -491,7 +491,7 @@ public class Stage4SecurityLockdown : MonoBehaviour
                 noticeStyle.alignment = TextAnchor.MiddleCenter;
                 noticeStyle.wordWrap = true;
             }
-            noticeStyle.normal.textColor = noticeColor;
+            noticeStyle.normal.textColor = Color.white;
             float nw = Mathf.Min(760f, Screen.width - 40f);
             GUI.Box(new Rect((Screen.width - nw) * 0.5f, Screen.height * 0.5f - 160f, nw, 70f), noticeText, noticeStyle);
         }
@@ -504,7 +504,7 @@ public class Stage4SecurityLockdown : MonoBehaviour
             bannerStyle.fontSize = 20;
             bannerStyle.fontStyle = FontStyle.Bold;
             bannerStyle.alignment = TextAnchor.MiddleCenter;
-            bannerStyle.normal.textColor = new Color(1f, 0.25f, 0.25f);
+            bannerStyle.normal.textColor = Color.white;
 
             timerStyle = new GUIStyle(GUI.skin.label);
             timerStyle.fontSize = 32;

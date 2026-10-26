@@ -392,6 +392,8 @@ namespace EscapeRoom.Editor
             Vector3 lidSize = new Vector3(boxW + 0.02f, 0.03f, boxD + 0.02f);
             Vector3 lidLocalPos = new Vector3(0f, lidSize.y * 0.5f, -lidSize.z * 0.5f);
             var lidPb = EscapeRoomBuilder.CreateProBuilderCube("Lockbox_LidSlab", lidHinge.transform, lidLocalPos, lidSize, Quaternion.identity, mat);
+            GameObjectUtility.SetStaticEditorFlags(lidPb.gameObject, 0);
+            GameObjectUtility.SetStaticEditorFlags(lidHinge, 0);
 
             // Add LockedContainer to containerRoot
             BoxCollider rootCollider = containerRoot.AddComponent<BoxCollider>();
@@ -402,6 +404,7 @@ namespace EscapeRoom.Editor
             locked.RequiredItemId = DefaultKeyId;
             locked.RequiredItemName = DefaultKeyName;
             locked.LidTransform = lidHinge.transform;
+            locked.OpenRotationOffset = new Vector3(110f, 0f, 0f);
             locked.ContentsObject = clue != null ? clue.gameObject : null;
 
             if (clue != null)
@@ -516,6 +519,8 @@ namespace EscapeRoom.Editor
             Vector3 slabLocalPos = new Vector3(doorW * 0.5f, doorH * 0.5f, 0f);
             Vector3 slabSize = new Vector3(doorW, doorH, doorThk);
             var slabPb = EscapeRoomBuilder.CreateProBuilderCube("Door_Slab", doorRoot.transform, slabLocalPos, slabSize, Quaternion.identity, mat);
+            GameObjectUtility.SetStaticEditorFlags(slabPb.gameObject, 0);
+            GameObjectUtility.SetStaticEditorFlags(doorRoot, 0);
 
             // Add DoorController to doorRoot
             BoxCollider col = doorRoot.AddComponent<BoxCollider>();

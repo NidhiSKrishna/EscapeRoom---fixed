@@ -52,6 +52,7 @@ namespace EscapeRoom.UI
             bool continuePressed = false;
             bool replayPressed = false;
             bool menuPressed = false;
+            bool quitPressed = false;
 
             // 1. New Input System Keyboard Check
             var keyboard = Keyboard.current;
@@ -71,6 +72,10 @@ namespace EscapeRoom.UI
                 {
                     menuPressed = true;
                 }
+                else if (keyboard.qKey.wasPressedThisFrame)
+                {
+                    quitPressed = true;
+                }
             }
 
 
@@ -85,6 +90,10 @@ namespace EscapeRoom.UI
             else if (menuPressed)
             {
                 OnMainMenuClicked();
+            }
+            else if (quitPressed)
+            {
+                OnQuitClicked();
             }
         }
 
@@ -209,6 +218,17 @@ namespace EscapeRoom.UI
             }
         }
 
+        public void OnQuitClicked()
+        {
+            Debug.Log("[EscapeUI] QUIT GAME requested.");
+            Time.timeScale = 1f;
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
         private void OnGUI()
         {
             if (!isOpen) return;
@@ -223,7 +243,7 @@ namespace EscapeRoom.UI
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
 
             float panelWidth = Mathf.Min(540f, Screen.width * 0.92f);
-            float panelHeight = 370f;
+            float panelHeight = 415f;
             float panelX = (Screen.width - panelWidth) * 0.5f;
             float panelY = (Screen.height - panelHeight) * 0.5f;
 
@@ -231,12 +251,12 @@ namespace EscapeRoom.UI
             GUI.color = new Color(0.10f, 0.12f, 0.16f, 0.98f);
             GUI.Box(new Rect(panelX, panelY, panelWidth, panelHeight), GUIContent.none);
 
-            // Border accent (gold)
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.90f);
+            // Border accent (dark steel cyan)
+            GUI.color = new Color(0.24f, 0.32f, 0.45f, 0.90f);
             GUI.Box(new Rect(panelX + 4, panelY + 4, panelWidth - 8, panelHeight - 8), GUIContent.none);
 
             // Card background fill
-            GUI.color = new Color(0.14f, 0.16f, 0.20f, 0.98f);
+            GUI.color = new Color(0.09f, 0.11f, 0.15f, 0.98f);
             GUI.Box(new Rect(panelX + 6, panelY + 6, panelWidth - 12, panelHeight - 12), GUIContent.none);
 
             string curScene = SceneManager.GetActiveScene().name;
@@ -251,9 +271,9 @@ namespace EscapeRoom.UI
                 fontSize = 28,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.98f, 0.85f, 0.25f) }
+                normal = { textColor = Color.white }
             };
-            GUI.Label(new Rect(panelX, panelY + 28f, panelWidth, 42), $"STAGE {currentStageNum} CLEARED!", titleStyle);
+            GUI.Label(new Rect(panelX, panelY + 24f, panelWidth, 40), $"STAGE {currentStageNum} CLEARED!", titleStyle);
 
             // Subtitle
             GUIStyle subStyle = new GUIStyle(GUI.skin.label)
@@ -261,25 +281,26 @@ namespace EscapeRoom.UI
                 fontSize = 13,
                 fontStyle = FontStyle.Normal,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.85f, 0.90f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             string subText = currentStageNum == 1
                 ? "You solved the Attic and unlocked the emergency descent into Sector B."
                 : (currentStageNum == 2 ? "You solved the Storage Room and unlocked the Security Control Room." : "You cleared the Security Control Room and unlocked the Final Control Room.");
-            GUI.Label(new Rect(panelX + 20, panelY + 76f, panelWidth - 40, 36), subText, subStyle);
+            GUI.Label(new Rect(panelX + 20, panelY + 68f, panelWidth - 40, 36), subText, subStyle);
 
             // Divider line
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.5f);
-            GUI.DrawTexture(new Rect(panelX + 40, panelY + 120f, panelWidth - 80, 2), Texture2D.whiteTexture);
+            GUI.color = new Color(0.24f, 0.32f, 0.45f, 0.50f);
+            GUI.DrawTexture(new Rect(panelX + 40, panelY + 110f, panelWidth - 80, 2), Texture2D.whiteTexture);
 
             // Button Rectangles
             float btnW = 280f;
-            float btnH = 46f;
+            float btnH = 44f;
             float btnX = panelX + (panelWidth - btnW) * 0.5f;
 
-            Rect continueBtnRect = new Rect(btnX, panelY + 138f, btnW, btnH);
-            Rect replayBtnRect = new Rect(btnX, panelY + 196f, btnW, 40f);
-            Rect menuBtnRect = new Rect(btnX, panelY + 248f, btnW, 40f);
+            Rect continueBtnRect = new Rect(btnX, panelY + 126f, btnW, btnH);
+            Rect replayBtnRect   = new Rect(btnX, panelY + 180f, btnW, 38f);
+            Rect menuBtnRect     = new Rect(btnX, panelY + 228f, btnW, 38f);
+            Rect quitBtnRect     = new Rect(btnX, panelY + 276f, btnW, 38f);
 
             // Reset GUI color before buttons
             GUI.color = Color.white;
@@ -290,9 +311,9 @@ namespace EscapeRoom.UI
                 fontSize = 15,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = Color.black }
+                normal = { textColor = Color.white }
             };
-            GUI.backgroundColor = new Color(0.25f, 0.88f, 0.45f);
+            GUI.backgroundColor = new Color(0.16f, 0.55f, 0.30f);
             string continueLabel = $"CONTINUE TO STAGE {currentStageNum + 1} ► [ENTER / C]";
             if (GUI.Button(continueBtnRect, continueLabel, stage2BtnStyle))
             {
@@ -307,14 +328,14 @@ namespace EscapeRoom.UI
                 alignment = TextAnchor.MiddleCenter,
                 normal = { textColor = Color.white }
             };
-            GUI.backgroundColor = new Color(0.20f, 0.60f, 0.80f);
+            GUI.backgroundColor = new Color(0.18f, 0.32f, 0.48f);
             if (GUI.Button(replayBtnRect, "REPLAY STAGE 1 [R]", playAgainStyle))
             {
                 OnPlayAgainClicked();
             }
 
             // 3. MAIN MENU
-            GUI.backgroundColor = new Color(0.32f, 0.35f, 0.42f);
+            GUI.backgroundColor = new Color(0.16f, 0.18f, 0.24f);
             GUIStyle menuStyle = new GUIStyle(GUI.skin.button)
             {
                 fontSize = 14,
@@ -327,7 +348,14 @@ namespace EscapeRoom.UI
                 OnMainMenuClicked();
             }
 
-            // 4. DIRECT MOUSE CLICK FALLBACK
+            // 4. QUIT GAME
+            GUI.backgroundColor = new Color(0.60f, 0.18f, 0.18f);
+            if (GUI.Button(quitBtnRect, "QUIT GAME [Q]", menuStyle))
+            {
+                OnQuitClicked();
+            }
+
+            // 5. DIRECT MOUSE CLICK FALLBACK
             Event e = Event.current;
             if (e != null && e.type == EventType.MouseDown && e.button == 0)
             {
@@ -344,6 +372,11 @@ namespace EscapeRoom.UI
                 else if (menuBtnRect.Contains(e.mousePosition))
                 {
                     OnMainMenuClicked();
+                    e.Use();
+                }
+                else if (quitBtnRect.Contains(e.mousePosition))
+                {
+                    OnQuitClicked();
                     e.Use();
                 }
             }

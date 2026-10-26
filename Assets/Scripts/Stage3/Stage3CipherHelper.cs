@@ -146,7 +146,7 @@ namespace EscapeRoom.Stage3
 
             GUIStyle windowStyle = new GUIStyle(GUI.skin.window);
             windowStyle.normal.background = Texture2D.blackTexture;
-            windowStyle.normal.textColor = new Color(0.98f, 0.85f, 0.25f);
+            windowStyle.normal.textColor = Color.white;
             windowStyle.fontSize = 18;
             windowStyle.fontStyle = FontStyle.Bold;
 
@@ -167,7 +167,7 @@ namespace EscapeRoom.Stage3
             GUILayout.FlexibleSpace();
 
             GUIStyle narrativeStyle = new GUIStyle(GUI.skin.label);
-            narrativeStyle.normal.textColor = new Color(0.6f, 0.6f, 0.6f);
+            narrativeStyle.normal.textColor = Color.white;
             narrativeStyle.wordWrap = true;
             narrativeStyle.fontSize = 12;
             narrativeStyle.alignment = TextAnchor.LowerCenter;
@@ -180,7 +180,7 @@ namespace EscapeRoom.Stage3
             GUILayout.Space(20);
 
             GUIStyle buttonStyle = new GUIStyle(GUI.skin.button);
-            buttonStyle.normal.textColor = new Color(0.95f, 0.35f, 0.35f);
+            buttonStyle.normal.textColor = Color.white;
             buttonStyle.fontSize = 14;
             buttonStyle.fontStyle = FontStyle.Bold;
             buttonStyle.fixedHeight = 30;

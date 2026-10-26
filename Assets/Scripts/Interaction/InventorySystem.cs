@@ -85,7 +85,7 @@ namespace EscapeRoom.Interaction
             itemDatabase[item.ItemId] = item;
 
             Debug.Log($"<color=#5cb85c><b>[InventorySystem]</b></color> Added item: '{item.DisplayName}' ({item.ItemId}). Total items: {collectedItemIds.Count}.");
-            FeedbackHUD.ShowMessage($"Acquired: {item.DisplayName}", new Color(0.98f, 0.85f, 0.35f));
+            FeedbackHUD.ShowMessage($"Acquired: {item.DisplayName}", Color.white);
 
             OnItemAdded?.Invoke(item);
             return true;

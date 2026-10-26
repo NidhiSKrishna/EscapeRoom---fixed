@@ -282,9 +282,9 @@ namespace EscapeRoom.UI
 
             if (om.IsFinalEscaped)
             {
-                headerStyle.normal.textColor = new Color(0.40f, 0.95f, 0.45f);
+                headerStyle.normal.textColor = Color.white;
                 GUI.Label(new Rect(hudX + 10, hudY + 6, hudW - 20, 16), "STAGE 3 COMPLETE", headerStyle);
-                instrStyle.normal.textColor = new Color(0.40f, 0.95f, 0.45f);
+                instrStyle.normal.textColor = Color.white;
                 string escapeMsg = !string.IsNullOrEmpty(om.FinalEscapedMessage)
                     ? om.FinalEscapedMessage
                     : "STAGE 3 COMPLETE — FACILITY ESCAPED!";
@@ -335,12 +335,12 @@ namespace EscapeRoom.UI
             GUI.color = new Color(0.10f, 0.12f, 0.16f, 0.98f);
             GUI.Box(new Rect(cardX, cardY, cardW, cardH), GUIContent.none);
 
-            // Gold border
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.85f);
+            // Dark steel cyan border
+            GUI.color = new Color(0.24f, 0.30f, 0.40f, 0.85f);
             GUI.Box(new Rect(cardX + 3, cardY + 3, cardW - 6, cardH - 6), GUIContent.none);
 
             // Background
-            GUI.color = new Color(0.12f, 0.14f, 0.18f, 1f);
+            GUI.color = new Color(0.09f, 0.11f, 0.15f, 1f);
             GUI.Box(new Rect(cardX + 5, cardY + 5, cardW - 10, cardH - 10), GUIContent.none);
 
             GUI.color = Color.white;
@@ -365,7 +365,7 @@ namespace EscapeRoom.UI
             GUI.Label(new Rect(cardX + 20, cardY + 50, cardW - 40, 18), "OBJECTIVE PROGRESSION ([T] or [ESC] to close)", subStyle);
 
             // Divider
-            GUI.color = new Color(0.96f, 0.78f, 0.20f, 0.40f);
+            GUI.color = new Color(0.24f, 0.30f, 0.40f, 0.40f);
             GUI.DrawTexture(new Rect(cardX + 30, cardY + 74, cardW - 60, 2), Texture2D.whiteTexture);
             GUI.color = Color.white;
 
@@ -425,7 +425,7 @@ namespace EscapeRoom.UI
                 normal = { textColor = Color.white }
             };
 
-            GUI.backgroundColor = new Color(0.95f, 0.80f, 0.25f, 1f);
+            GUI.backgroundColor = new Color(0.18f, 0.26f, 0.38f, 1f);
             if (GUI.Button(new Rect(btnX, btnY, btnW, btnH), "CLOSE [T]", closeBtnStyle))
             {
                 CloseExpandedView();

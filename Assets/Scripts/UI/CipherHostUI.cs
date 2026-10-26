@@ -112,6 +112,46 @@ namespace EscapeRoom.UI
             },
 
             // ── Stage 2: Storage Room ─────────────────────────────────────────
+            ["MEMO_READ"] = new[]
+            {
+                "\"Check the main desk for the project memo to get your bearings.\"",
+                "\"Search the tables and work surfaces for documentation.\"",
+                "\"Read the memo on the desk — it outlines the facility security systems.\""
+            },
+            ["ITEM_FOUND"] = new[]
+            {
+                "\"Search the room for the security chip needed by the terminal.\"",
+                "\"Check the search spots around the room — drawers, shelves, crates, or tables.\"",
+                "\"Any search spot in the room contains the security chip. Press E to search!\""
+            },
+            ["PATTERN_SOLVED"] = new[]
+            {
+                "\"Take your retrieved security chip to the locked Pattern Terminal.\"",
+                "\"Insert the security chip into the terminal to reveal the code.\"",
+                "\"The pattern terminal displays the 3-digit combination for the storage box!\""
+            },
+            ["SAFE_UNLOCKED"] = new[]
+            {
+                "\"Find the heavy storage container across the room.\"",
+                "\"Enter the 3-digit code you got from the pattern terminal.\"",
+                "\"Submit the 3-digit combination to open the container lid.\""
+            },
+            ["KEYCARD_ACQUIRED"] = new[]
+            {
+                "\"Look inside the opened container.\"",
+                "\"There is a security access keycard inside. Grab it.\"",
+                "\"Pick up the keycard to gain exit door clearance.\""
+            },
+            ["CELLAR_UNLOCKED"] = new[]
+            {
+                "\"Find the reinforced exit door on the wall.\"",
+                "\"Locate the keycard reader mounted beside the door.\"",
+                "\"Swipe your keycard at the reader to unlock the door and escape!\""
+            },
+            ["STAGE2_COMPLETE"] = new[]
+            {
+                "\"The door is unsealed! Proceed into the corridor toward Sector C.\""
+            },
             ["CLUE_FOUND"] = new[]
             {
                 "\"Look closely around the work tables and storage shelves for documents.\"",
@@ -207,6 +247,20 @@ namespace EscapeRoom.UI
                 "\"That note has the code you need for the keypad.\"",
 
             // Stage 2
+            ["MEMO_READ"] =
+                "\"Storage bay ahead. Search the desk for the project memo.\"",
+            ["ITEM_FOUND"] =
+                "\"Search the room — find the security chip to unlock the terminal.\"",
+            ["PATTERN_SOLVED"] =
+                "\"Insert your security chip into the Pattern Terminal.\"",
+            ["SAFE_UNLOCKED"] =
+                "\"Enter the 3-digit code at the storage container.\"",
+            ["KEYCARD_ACQUIRED"] =
+                "\"Collect the keycard from inside the storage container.\"",
+            ["CELLAR_UNLOCKED"] =
+                "\"Use the keycard on the door reader to disarm the mag-lock.\"",
+            ["STAGE2_COMPLETE"] =
+                "\"Clearance granted! Move into the next sector.\"",
             ["CLUE_FOUND"] =
                 "\"Storage bay ahead. Search the tables for symbol clues.\"",
             ["COMBO_DISCOVERED"] =
@@ -244,6 +298,20 @@ namespace EscapeRoom.UI
                 "\"That's it. The exit is unlocked. Move quickly.\"",
 
             // Stage 2
+            ["MEMO_READ"] =
+                "\"Memo secured. Now search any spot in the room for the security chip.\"",
+            ["ITEM_FOUND"] =
+                "\"Security chip acquired! Take it to the pattern terminal.\"",
+            ["PATTERN_SOLVED"] =
+                "\"Terminal unlocked! You have the 3-digit combination.\"",
+            ["SAFE_UNLOCKED"] =
+                "\"Storage container opened! Grab the keycard inside.\"",
+            ["KEYCARD_ACQUIRED"] =
+                "\"Security keycard acquired. Head to the exit door reader.\"",
+            ["CELLAR_UNLOCKED"] =
+                "\"Door unsealed! Proceed to the Security Control Room!\"",
+            ["STAGE2_COMPLETE"] =
+                "\"Stage 2 cleared! Moving into Sector C.\"",
             ["CLUE_FOUND"] =
                 "\"Symbol document secured. Let's inspect the combination.\"",
             ["COMBO_DISCOVERED"] =
@@ -293,25 +361,43 @@ namespace EscapeRoom.UI
                 }
                 return;
             }
-            instance = this;
-            // Only DontDestroyOnLoad if this GameObject is exclusively a dedicated [CipherHostUI] instance!
-            // Never mark shared scene manager GameObjects (e.g. GameManagers) as DontDestroyOnLoad!
-            if (gameObject.name == "[CipherHostUI]")
+
+            // If we are attached to a multi-component scene object (like GameManagers in Level 1),
+            // transfer to dedicated standalone GameObject so it survives across all scenes!
+            if (gameObject.name != "[CipherHostUI]")
             {
-                DontDestroyOnLoad(gameObject);
+                GameObject cipherGo = new GameObject("[CipherHostUI]");
+                DontDestroyOnLoad(cipherGo);
+                CipherHostUI newHost = cipherGo.AddComponent<CipherHostUI>();
+                instance = newHost;
+                Destroy(this);
+                return;
             }
+
+            instance = this;
+            DontDestroyOnLoad(gameObject);
             EnsurePortraitLoaded();
         }
 
-        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.AfterSceneLoad)]
-        private static void AutoEnsureInstance()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void RegisterSceneListener()
         {
-            string scene = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
-            if (scene == "MainMenu") return;
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded -= OnSceneLoadedGlobal;
+            UnityEngine.SceneManagement.SceneManager.sceneLoaded += OnSceneLoadedGlobal;
+        }
+
+        private static void OnSceneLoadedGlobal(UnityEngine.SceneManagement.Scene scene, UnityEngine.SceneManagement.LoadSceneMode mode)
+        {
+            if (scene.name == "MainMenu") return;
             if (instance == null)
             {
-                GameObject go = new GameObject("[CipherHostUI]");
-                go.AddComponent<CipherHostUI>();
+                var existing = UnityEngine.Object.FindAnyObjectByType<CipherHostUI>();
+                if (existing == null)
+                {
+                    GameObject go = new GameObject("[CipherHostUI]");
+                    go.AddComponent<CipherHostUI>();
+                    Debug.Log($"<color=#5cb85c>[CipherHostUI]</color> Auto-instantiated dedicated [CipherHostUI] for {scene.name}.");
+                }
             }
         }
 
@@ -437,13 +523,13 @@ namespace EscapeRoom.UI
             switch (sceneName)
             {
                 case "StorageRoom":
-                    return "\"Storage Bay reached. Look for symbol markings and locked supply lockers.\"";
+                    return "\"Storage Bay reached. Search any spot in the room for the security chip to unlock the terminal.\"";
                 case "SecurityControlRoom":
-                    return "\"Security Control Room. Clear the systems in sequence: Color lights, Red box, Grid path, then Symbol terminal.\"";
+                    return "\"Security Control Room. Solve in sequence: Color lights, Red box, Grid path, then Symbol terminal.\"";
                 case "FinalControlRoom":
-                    return "\"Final Control Center. This is the last stretch — override the core systems to break out!\"";
+                    return "\"Final Control Center. 4 core systems ahead: Pattern, Memory, Console, and Wires. Break out!\"";
                 case "VaultCellar":
-                    return "\"Vault Cellar reached. Keep your senses keen, we are nearing the final door.\"";
+                    return "\"Vault Cellar reached. Stay vigilant — we are nearing the final door.\"";
                 default:
                     return null;
             }
@@ -540,9 +626,22 @@ namespace EscapeRoom.UI
         public void GiveHint()
         {
             isHintOfferOpen = false;
-            var step = ObjectiveManager.Instance?.CurrentStep;
             string sceneName = UnityEngine.SceneManagement.SceneManager.GetActiveScene().name;
 
+            if (sceneName == "FinalControlRoom")
+            {
+                var s4 = FindAnyObjectByType<Stage4Manager>();
+                if (s4 != null)
+                {
+                    string hint = GetStage4Hint(s4.GetCurrentState());
+                    ShowMessage(hint, duration: messageDisplayDuration + 2.5f);
+                    inactivityTimer = 0f;
+                    hintCooldownTimer = hintOfferCooldown * 0.5f;
+                    return;
+                }
+            }
+
+            var step = ObjectiveManager.Instance?.CurrentStep;
             if (step != null && !string.IsNullOrEmpty(step.CompletionFlag) && HintsByFlag.TryGetValue(step.CompletionFlag, out string[] hints))
             {
                 int idx = Mathf.Clamp(currentHintLevel, 0, hints.Length - 1);
@@ -559,6 +658,71 @@ namespace EscapeRoom.UI
             hintCooldownTimer = hintOfferCooldown * 0.5f;
         }
 
+        private string GetStage4Hint(Stage4State state)
+        {
+            switch (state)
+            {
+                case Stage4State.PatternPuzzle:
+                    string[] pHints = {
+                        "\"Analyze the number sequence at the Pattern Terminal.\"",
+                        "\"Find the difference between successive numbers in the pattern.\"",
+                        "\"Submit the missing number at the terminal — it is DIGIT 1 of the master keypad!\""
+                    };
+                    int pIdx = Mathf.Clamp(currentHintLevel, 0, pHints.Length - 1);
+                    if (currentHintLevel < pHints.Length - 1) currentHintLevel++;
+                    return pHints[pIdx];
+
+                case Stage4State.MemoryPuzzle:
+                    string[] mHints = {
+                        "\"Interact with the Memory Light panel on the side wall.\"",
+                        "\"Memorize the flashing sequence of colored lights.\"",
+                        "\"Repeat the colors by clicking the buttons. The LAST light index gives you DIGIT 2!\""
+                    };
+                    int mIdx = Mathf.Clamp(currentHintLevel, 0, mHints.Length - 1);
+                    if (currentHintLevel < mHints.Length - 1) currentHintLevel++;
+                    return mHints[mIdx];
+
+                case Stage4State.ControlPanel:
+                    string[] cHints = {
+                        "\"Inspect the wall monitors and compare them to control consoles A, B, C, D.\"",
+                        "\"Find the panel matching the first color from your memory sequence.\"",
+                        "\"Switch that matching panel. Its number (1-4) is DIGIT 3!\""
+                    };
+                    int cIdx = Mathf.Clamp(currentHintLevel, 0, cHints.Length - 1);
+                    if (currentHintLevel < cHints.Length - 1) currentHintLevel++;
+                    return cHints[cIdx];
+
+                case Stage4State.PathPuzzle:
+                    string[] wHints = {
+                        "\"The Power Junction Box needs rewiring to restore energy.\"",
+                        "\"Connect the wire terminals in voltage order from lowest to highest.\"",
+                        "\"The number of the LAST terminal connected gives you DIGIT 4!\""
+                    };
+                    int wIdx = Mathf.Clamp(currentHintLevel, 0, wHints.Length - 1);
+                    if (currentHintLevel < wHints.Length - 1) currentHintLevel++;
+                    return wHints[wIdx];
+
+                case Stage4State.CodePuzzle:
+                    string[] kHints = {
+                        "\"Assemble the 4 digits from the 4 puzzles: Pattern, Memory, Panel, Wires.\"",
+                        "\"Check your recipe banners or memory for Digits 1, 2, 3, and 4.\"",
+                        "\"Enter the 4-digit code into the master security keypad to unlock the facility!\""
+                    };
+                    int kIdx = Mathf.Clamp(currentHintLevel, 0, kHints.Length - 1);
+                    if (currentHintLevel < kHints.Length - 1) currentHintLevel++;
+                    return kHints[kIdx];
+
+                case Stage4State.FinalOverride:
+                    return "\"Interact with the central terminal to execute the master facility override!\"";
+
+                case Stage4State.Lockdown:
+                    return "\"Emergency alarm active! Run through the open blast doors to complete extraction!\"";
+
+                default:
+                    return "\"Survey the consoles in the room. Clear each subsystem to escape.\"";
+            }
+        }
+
         private string GetFallbackHintForScene(string sceneName)
         {
             switch (sceneName)
@@ -566,7 +730,7 @@ namespace EscapeRoom.UI
                 case "EscapeRoom_Main":
                     return "\"Check the desk drawers and table for keys, then inspect the lockbox and keypad.\"";
                 case "StorageRoom":
-                    return "\"Search the storage workbenches for notes showing symbol combinations to unlock the supply locker.\"";
+                    return "\"Search any drawer or crate for the security chip, then insert it into the pattern terminal.\"";
                 case "SecurityControlRoom":
                     return "\"Follow the exact sequence: Color lights panel -> Red alarm box -> Floor grid memory -> Symbol monitor console.\"";
                 case "FinalControlRoom":
@@ -730,7 +894,7 @@ namespace EscapeRoom.UI
             // Name label: CIPHER · DIGITAL GUIDE
             float textX = px + portW + 16f;
             float textW = pw - (portW + 24f);
-            nameStyle.normal.textColor = accentColor * new Color(1, 1, 1, alpha);
+            nameStyle.normal.textColor = new Color(1f, 1f, 1f, alpha);
             GUI.Label(new Rect(textX, py + 8f, textW, 20f), hostName + "  ·  DIGITAL GUIDE", nameStyle);
 
             // Divider line
@@ -749,7 +913,7 @@ namespace EscapeRoom.UI
             else
             {
                 displayMsg = GetIdleGuidance();
-                msgStyle.normal.textColor = new Color(0.70f, 0.85f, 0.95f, 0.85f * alpha);
+                msgStyle.normal.textColor = new Color(1.0f, 1.0f, 1.0f, alpha);
             }
 
             GUI.Label(new Rect(textX, py + 33f, textW, ph - 38f), displayMsg, msgStyle);
@@ -764,12 +928,29 @@ namespace EscapeRoom.UI
             switch (sceneName)
             {
                 case "EscapeRoom_Main":
-                    return "\"Attic escape active. Press [H] for clue.\"";
+                    var s1 = ObjectiveManager.Instance?.CurrentStep;
+                    return s1 != null ? $"\"Attic: {s1.Instruction}\"" : "\"Attic escape active. Press [H] for clue.\"";
                 case "StorageRoom":
-                    return "\"Storage bay active. Press [H] for clue.\"";
+                    var s2 = ObjectiveManager.Instance?.CurrentStep;
+                    return s2 != null ? $"\"Storage: {s2.Instruction}\"" : "\"Storage bay active. Press [H] for clue.\"";
                 case "SecurityControlRoom":
-                    return "\"Security control active. Press [H] for clue.\"";
+                    var s3 = ObjectiveManager.Instance?.CurrentStep;
+                    return s3 != null ? $"\"Security: {s3.Instruction}\"" : "\"Security control active. Press [H] for clue.\"";
                 case "FinalControlRoom":
+                    var s4 = FindAnyObjectByType<Stage4Manager>();
+                    if (s4 != null)
+                    {
+                        switch (s4.GetCurrentState())
+                        {
+                            case Stage4State.PatternPuzzle: return "\"Final: Solve pattern terminal. Press [H] for clue.\"";
+                            case Stage4State.MemoryPuzzle: return "\"Final: Solve memory lights. Press [H] for clue.\"";
+                            case Stage4State.ControlPanel: return "\"Final: Authorize matching console. Press [H] for clue.\"";
+                            case Stage4State.PathPuzzle: return "\"Final: Rewire junction box. Press [H] for clue.\"";
+                            case Stage4State.CodePuzzle: return "\"Final: Enter 4-digit master code. Press [H] for clue.\"";
+                            case Stage4State.FinalOverride: return "\"Final: Activate primary override!\"";
+                            case Stage4State.Lockdown: return "\"Lockdown! Run to extraction door!\"";
+                        }
+                    }
                     return "\"Final control room. Press [H] for clue.\"";
                 default:
                     return "\"Online. Press [H] for clue.\"";

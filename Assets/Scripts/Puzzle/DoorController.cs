@@ -100,6 +100,10 @@ namespace EscapeRoom.Puzzle
             closedRotation = hingeTransform.localRotation;
         }
 
+        [Header("Transition Lighting")]
+        [Tooltip("Optional light that illuminates the doorway opening transition.")]
+        [SerializeField] private Light doorwayGlowLight;
+
         public void Interact()
         {
             if (isOpen) return;
@@ -107,7 +111,7 @@ namespace EscapeRoom.Puzzle
             if (isLocked)
             {
                 Debug.Log("[DoorController] Exit door is locked. Clear all security systems to unlock.");
-                FeedbackHUD.ShowMessage("Exit door is locked! Clear all security systems to unlock.", new Color(0.95f, 0.40f, 0.40f));
+                FeedbackHUD.ShowMessage("Exit door is locked! Clear all security systems to unlock.", Color.white);
                 return;
             }
 
@@ -125,11 +129,12 @@ namespace EscapeRoom.Puzzle
             Debug.Log($"<color=#5cb85c><b>[DoorController]</b></color> '{gameObject.name}' unlocked!");
 
             // ── Door unlock sound ─────────────────────────────────────────────
+            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorUnlock);
             EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                 EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorUnlock,
                 transform.position);
 
-            FeedbackHUD.ShowMessage("Exit Door Unlocked!", new Color(0.40f, 0.95f, 0.45f));
+            FeedbackHUD.ShowMessage("Exit Door Unlocked!", Color.white);
             onDoorUnlocked?.Invoke();
 
             if (autoOpenOnUnlock)
@@ -148,7 +153,7 @@ namespace EscapeRoom.Puzzle
         }
 
         /// <summary>
-        /// Animates the door open if unlocked.
+        /// Animates the door open if unlocked with audio and lighting transition.
         /// </summary>
         public void OpenDoor()
         {
@@ -160,19 +165,53 @@ namespace EscapeRoom.Puzzle
                 StopCoroutine(swingCoroutine);
             }
 
-            // ── Door open sound ───────────────────────────────────────────────
+            // ── Door open sound: 2D reinforcement + 3D spatial ────────────────
+            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorOpen);
             EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                 EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorOpen,
                 transform.position);
+
+            // Ensure doorway transition light
+            EnsureDoorwayLight();
 
             if (gameObject.activeInHierarchy)
             {
                 swingCoroutine = StartCoroutine(AnimateDoorSwing());
             }
 
+            // Disable root interaction collider so doorway passage is completely clear
+            Collider rootCol = GetComponent<Collider>();
+            if (rootCol != null)
+            {
+                rootCol.enabled = false;
+            }
+
             Debug.Log($"<color=#5cb85c><b>[DoorController]</b></color> '{gameObject.name}' opening...");
-            FeedbackHUD.ShowMessage("Exit Door Opened - Proceed to Exit!", new Color(0.35f, 0.95f, 0.95f));
+            FeedbackHUD.ShowMessage("Exit Door Opened - Proceed to Exit!", Color.white);
             onDoorOpened?.Invoke();
+        }
+
+        private void EnsureDoorwayLight()
+        {
+            if (doorwayGlowLight == null)
+            {
+                var lightChild = transform.Find("DoorwayGlowLight");
+                if (lightChild != null)
+                {
+                    doorwayGlowLight = lightChild.GetComponent<Light>();
+                }
+                else
+                {
+                    GameObject glowGo = new GameObject("DoorwayGlowLight");
+                    glowGo.transform.SetParent(transform, false);
+                    glowGo.transform.localPosition = new Vector3(0.52f, 1.4f, 0.40f);
+                    doorwayGlowLight = glowGo.AddComponent<Light>();
+                    doorwayGlowLight.type = LightType.Point;
+                    doorwayGlowLight.color = new Color(0.98f, 0.92f, 0.78f);
+                    doorwayGlowLight.range = 6.0f;
+                    doorwayGlowLight.intensity = 0f;
+                }
+            }
         }
 
         private IEnumerator AnimateDoorSwing()
@@ -188,10 +227,20 @@ namespace EscapeRoom.Puzzle
                 float t = Mathf.Clamp01(elapsed / animationDuration);
                 float smoothT = Mathf.SmoothStep(0f, 1f, t);
                 target.localRotation = Quaternion.Slerp(startRot, targetRot, smoothT);
+
+                if (doorwayGlowLight != null)
+                {
+                    doorwayGlowLight.intensity = Mathf.Lerp(0f, 2.2f, smoothT);
+                }
+
                 yield return null;
             }
 
             target.localRotation = targetRot;
+            if (doorwayGlowLight != null)
+            {
+                doorwayGlowLight.intensity = 2.2f;
+            }
         }
     }
 }

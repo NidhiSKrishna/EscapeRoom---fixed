@@ -35,7 +35,7 @@ namespace EscapeRoom.Interaction
         [SerializeField] private Transform lidTransform;
 
         [Tooltip("Target local euler rotation angles for open state.")]
-        [SerializeField] private Vector3 openRotationOffset = new Vector3(-105f, 0f, 0f);
+        [SerializeField] private Vector3 openRotationOffset = new Vector3(110f, 0f, 0f);
 
         [Tooltip("Duration of the lid opening animation in seconds.")]
         [SerializeField] private float openDuration = 0.8f;
@@ -76,6 +76,12 @@ namespace EscapeRoom.Interaction
         {
             get => lidTransform;
             set => lidTransform = value;
+        }
+
+        public Vector3 OpenRotationOffset
+        {
+            get => openRotationOffset;
+            set => openRotationOffset = value;
         }
 
         public GameObject ContentsObject
@@ -127,6 +133,18 @@ namespace EscapeRoom.Interaction
                 lockedMissingKeyPrompt = "Locked - requires {0}";
             }
 
+            // Invert negative rotation if present so lid swings open upwards and backwards (+110°)
+            if (openRotationOffset.x < 0f)
+            {
+                openRotationOffset = new Vector3(-openRotationOffset.x, openRotationOffset.y, openRotationOffset.z);
+            }
+
+            if (lidTransform == null)
+            {
+                Transform foundHinge = transform.Find("Lockbox_LidHinge");
+                if (foundHinge != null) lidTransform = foundHinge;
+            }
+
             if (lidTransform != null)
             {
                 closedRotation = lidTransform.localRotation;
@@ -159,7 +177,7 @@ namespace EscapeRoom.Interaction
 
             if (isLocked)
             {
-                // ── Step 1: Try to unlock ────────────────────────────────────────
+                // ── Step 1: Unlock and smoothly transition open ──────────────────
                 InventorySystem inventory = InventorySystem.Instance;
                 if (inventory == null)
                 {
@@ -172,21 +190,19 @@ namespace EscapeRoom.Interaction
                 if (!hasKey)
                 {
                     Debug.Log($"[LockedContainer] '{gameObject.name}' is locked. Requires '{requiredItemId}'.");
-                    FeedbackHUD.ShowMessage($"Locked - requires {requiredItemName}", new Color(0.95f, 0.40f, 0.40f));
+                    FeedbackHUD.ShowMessage($"Locked - requires {requiredItemName}", Color.white);
                     return;
                 }
 
-                // Player holds the required key — unlock only, do NOT open yet.
+                // Player holds the required key — unlock and execute opening transition
                 isLocked = false;
                 Debug.Log($"<color=#5cb85c><b>[LockedContainer]</b></color> '{gameObject.name}' unlocked using '{requiredItemId}'!");
 
                 // ── Unlock sound ──────────────────────────────────────────────
+                EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.LockboxUnlock);
                 EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                     EscapeRoom.Audio.EscapeRoomAudio.SoundId.LockboxUnlock,
                     transform.position);
-
-                // Show a clear two-part message so the player knows what to do next.
-                FeedbackHUD.ShowMessage("BOX UNLOCKED  ·  Press E again to OPEN", new Color(0.40f, 0.90f, 0.45f));
 
                 if (consumeKey && inventory != null)
                 {
@@ -198,14 +214,14 @@ namespace EscapeRoom.Interaction
 
                 onContainerUnlocked?.Invoke();
 
-                // Do NOT call OpenContainer() here — player must press E again.
+                // Seamlessly trigger opening transition
+                OpenContainer();
                 return;
             }
 
             // ── Step 2: Already unlocked — open the lid ──────────────────────
             OpenContainer();
         }
-
 
         public void OpenContainer()
         {
@@ -234,6 +250,10 @@ namespace EscapeRoom.Interaction
             if (contentsObject != null)
             {
                 contentsObject.SetActive(true);
+                if (gameObject.activeInHierarchy)
+                {
+                    StartCoroutine(AnimateContentsReveal());
+                }
             }
 
             // Disable container interaction collider so player can directly look at and target contents
@@ -245,10 +265,13 @@ namespace EscapeRoom.Interaction
 
             Debug.Log($"<color=#5cb85c><b>[LockedContainer]</b></color> '{gameObject.name}' is now open.");
 
-            // ── Lid-open sound ────────────────────────────────────────────────
+            // ── Lid-open sound: 2D reinforcement + 3D spatial ────────────────
+            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.LockboxOpen);
             EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                 EscapeRoom.Audio.EscapeRoomAudio.SoundId.LockboxOpen,
                 transform.position);
+
+            FeedbackHUD.ShowMessage("BOX OPENED — Clue note revealed!", Color.white);
 
             onContainerOpened?.Invoke();
             OnAnyContainerOpened?.Invoke();
@@ -264,13 +287,38 @@ namespace EscapeRoom.Interaction
             {
                 elapsed += Time.deltaTime;
                 float t = Mathf.Clamp01(elapsed / openDuration);
-                // Smooth step curve
                 float smoothT = Mathf.SmoothStep(0f, 1f, t);
                 lidTransform.localRotation = Quaternion.Slerp(startRot, targetRot, smoothT);
                 yield return null;
             }
 
             lidTransform.localRotation = targetRot;
+        }
+
+        private IEnumerator AnimateContentsReveal()
+        {
+            if (contentsObject == null) yield break;
+
+            Vector3 startPos = contentsObject.transform.localPosition;
+            Vector3 targetPos = new Vector3(startPos.x, Mathf.Min(0.065f, startPos.y + 0.035f), startPos.z);
+            float elapsed = 0f;
+            float duration = Mathf.Max(0.1f, openDuration * 0.9f);
+
+            while (elapsed < duration)
+            {
+                elapsed += Time.deltaTime;
+                float t = Mathf.SmoothStep(0f, 1f, Mathf.Clamp01(elapsed / duration));
+                if (contentsObject != null)
+                {
+                    contentsObject.transform.localPosition = Vector3.Lerp(startPos, targetPos, t);
+                }
+                yield return null;
+            }
+
+            if (contentsObject != null)
+            {
+                contentsObject.transform.localPosition = targetPos;
+            }
         }
     }
 }

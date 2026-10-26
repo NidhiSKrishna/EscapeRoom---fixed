@@ -344,7 +344,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 11,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleLeft,
-                normal = { textColor = new Color(0.40f, 0.90f, 1f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 24, winY + 16, winW - 170, 20f), $"[ {card.tag} ]", tagStyle);
 
@@ -354,7 +354,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 12,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleRight,
-                normal = { textColor = new Color(0.98f, 0.82f, 0.25f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + winW - 180, winY + 16, 156, 20f), $"CARD {cardIdx + 1} OF {totalCards}", counterStyle);
 
@@ -373,7 +373,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 11,
                 alignment = TextAnchor.MiddleLeft,
-                normal = { textColor = new Color(0.70f, 0.80f, 0.90f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 24, winY + 80, winW - 48, 20f), card.subtitle, subStyle);
 
@@ -390,7 +390,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 14,
                 wordWrap = true,
                 alignment = TextAnchor.UpperLeft,
-                normal = { textColor = new Color(0.92f, 0.95f, 0.98f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 28, bodyY, winW - 56, bodyH), card.body, bodyStyle);
 
@@ -405,7 +405,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 14,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.50f, 0.85f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 24, footerY - 22f, winW - 48, 20f), dots.TrimEnd(), dotsStyle);
 
@@ -435,7 +435,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = new Color(0.95f, 0.85f, 0.35f) }
+                normal = { textColor = Color.white }
             };
 
             GUI.backgroundColor = new Color(0.20f, 0.22f, 0.28f, 1f);
@@ -453,7 +453,7 @@ namespace EscapeRoom.Stage2
             {
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
-                normal = { textColor = isLastCard ? Color.black : Color.white }
+                normal = { textColor = Color.white }
             };
 
             if (isLastCard)

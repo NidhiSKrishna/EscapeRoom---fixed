@@ -227,12 +227,12 @@ public class Stage4PatternPuzzle : MonoBehaviour
         titleStyle.fontSize = 28;
         titleStyle.fontStyle = FontStyle.Bold;
         titleStyle.alignment = TextAnchor.MiddleCenter;
-        titleStyle.normal.textColor = new Color(1f, 0.65f, 0.2f);
+        titleStyle.normal.textColor = Color.white;
 
         textStyle = new GUIStyle(GUI.skin.label);
         textStyle.fontSize = 16;
         textStyle.alignment = TextAnchor.MiddleCenter;
-        textStyle.normal.textColor = new Color(0.8f, 0.9f, 1f);
+        textStyle.normal.textColor = Color.white;
 
         seqStyle = new GUIStyle(GUI.skin.label);
         seqStyle.fontSize = 44;
@@ -244,10 +244,12 @@ public class Stage4PatternPuzzle : MonoBehaviour
         messageStyle.fontSize = 22;
         messageStyle.fontStyle = FontStyle.Bold;
         messageStyle.alignment = TextAnchor.MiddleCenter;
+        messageStyle.normal.textColor = Color.white;
 
         buttonStyle = new GUIStyle(GUI.skin.button);
         buttonStyle.fontSize = 22;
         buttonStyle.fontStyle = FontStyle.Bold;
+        buttonStyle.normal.textColor = Color.white;
     }
 
     private void OnGUI()
@@ -266,7 +268,7 @@ public class Stage4PatternPuzzle : MonoBehaviour
 
         if (!string.IsNullOrEmpty(message))
         {
-            messageStyle.normal.textColor = solved ? new Color(0.3f, 1f, 0.5f) : new Color(1f, 0.35f, 0.35f);
+            messageStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(r.x, r.y + 160f, w, 30f), message, messageStyle);
         }
 

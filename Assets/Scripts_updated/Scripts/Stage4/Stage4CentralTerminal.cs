@@ -225,7 +225,7 @@ public class Stage4CentralTerminal : MonoBehaviour
         titleStyle.fontSize = 24;
         titleStyle.fontStyle = FontStyle.Bold;
         titleStyle.alignment = TextAnchor.MiddleCenter;
-        titleStyle.normal.textColor = new Color(0.3f, 0.75f, 1f);
+        titleStyle.normal.textColor = Color.white;
 
         headerStyle = new GUIStyle(GUI.skin.label);
         headerStyle.fontSize = 16;
@@ -236,16 +236,19 @@ public class Stage4CentralTerminal : MonoBehaviour
         statusStyle.fontSize = 18;
         statusStyle.fontStyle = FontStyle.Bold;
         statusStyle.alignment = TextAnchor.MiddleCenter;
+        statusStyle.normal.textColor = Color.white;
 
         stepStyle = new GUIStyle(GUI.skin.box);
         stepStyle.fontSize = 16;
         stepStyle.fontStyle = FontStyle.Bold;
         stepStyle.alignment = TextAnchor.MiddleLeft;
         stepStyle.padding = new RectOffset(15, 10, 10, 10);
+        stepStyle.normal.textColor = Color.white;
 
         btnStyle = new GUIStyle(GUI.skin.button);
         btnStyle.fontSize = 18;
         btnStyle.fontStyle = FontStyle.Bold;
+        btnStyle.normal.textColor = Color.white;
     }
 
     private void OnGUI()
@@ -266,7 +269,7 @@ public class Stage4CentralTerminal : MonoBehaviour
 
         if (!isReady && !executingOverride)
         {
-            statusStyle.normal.textColor = new Color(1f, 0.3f, 0.3f);
+            statusStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(r.x, r.y + 80f, w, 30f), "OVERRIDE STATUS: LOCKED", statusStyle);
 
             GUI.Label(new Rect(r.x + 30f, r.y + 150f, w - 60f, 80f),
@@ -275,13 +278,13 @@ public class Stage4CentralTerminal : MonoBehaviour
         }
         else if (executingOverride)
         {
-            statusStyle.normal.textColor = new Color(1f, 0.2f, 0.2f);
+            statusStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(r.x, r.y + 140f, w, 35f), "EXECUTING FINAL OVERRIDE...", statusStyle);
             GUI.Label(new Rect(r.x, r.y + 190f, w, 35f), "WARNING: SECURITY LOCKDOWN IMMINENT", statusStyle);
         }
         else
         {
-            statusStyle.normal.textColor = new Color(0.2f, 1f, 0.4f);
+            statusStyle.normal.textColor = Color.white;
             GUI.Label(new Rect(r.x, r.y + 75f, w, 30f), "OVERRIDE STATUS: AUTHORIZED & READY", statusStyle);
 
             // Show 5 steps
@@ -289,9 +292,7 @@ public class Stage4CentralTerminal : MonoBehaviour
             {
                 Rect stepR = new Rect(r.x + 40f, r.y + 115f + i * 44f, w - 80f, 38f);
                 string mark = i < currentOverrideStep ? "[OK]  " : "[...]  ";
-                Color c = i < currentOverrideStep ? new Color(0.3f, 1f, 0.4f) :
-                          (i == currentOverrideStep ? new Color(1f, 0.85f, 0.2f) : Color.gray);
-                stepStyle.normal.textColor = c;
+                stepStyle.normal.textColor = Color.white;
                 GUI.Box(stepR, mark + StepTitles[i], stepStyle);
             }
 

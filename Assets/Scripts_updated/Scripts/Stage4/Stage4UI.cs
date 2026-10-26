@@ -160,6 +160,10 @@ public class Stage4UI : MonoBehaviour
 
     public void ShowCipherDialogue(string message)
     {
+        if (EscapeRoom.UI.CipherHostUI.Instance != null)
+        {
+            EscapeRoom.UI.CipherHostUI.Instance.ShowMessage(message, 5.5f);
+        }
         cipherActiveDialogue = message;
         cipherDialogueUntil = Time.unscaledTime + 5.5f;
     }
@@ -189,12 +193,19 @@ public class Stage4UI : MonoBehaviour
 
     private void Update()
     {
-        // H = show the current instructions again (for example the keypad code recipe).
         Keyboard keyboard = Keyboard.current;
-        if (keyboard != null && keyboard.hKey.wasPressedThisFrame && !string.IsNullOrEmpty(lastInstruction))
+        if (keyboard != null)
         {
-            currentInstruction = lastInstruction;
-            instructionUntil = Time.unscaledTime + helpKeySeconds;
+            // H = show the current instructions again (for example the keypad code recipe).
+            if (keyboard.hKey.wasPressedThisFrame && !string.IsNullOrEmpty(lastInstruction))
+            {
+                currentInstruction = lastInstruction;
+                instructionUntil = Time.unscaledTime + helpKeySeconds;
+            }
+            if (showEscapeScreen && keyboard.qKey.wasPressedThisFrame)
+            {
+                QuitApplication();
+            }
         }
     }
 
@@ -310,6 +321,8 @@ public class Stage4UI : MonoBehaviour
         StartCoroutine(DialogueSequenceRoutine());
     }
 
+    private float autoExitCountdown = -1f;
+
     private void HandleStageReset()
     {
         showEscapeScreen = false;
@@ -317,6 +330,7 @@ public class Stage4UI : MonoBehaviour
         gameOverExited = false;
         congratsUntil = 0f;
         dialogueStep = 0;
+        autoExitCountdown = -1f;
         Stage4TestPlayer.InputLocked = false;
         HideMessage();
     }
@@ -329,8 +343,28 @@ public class Stage4UI : MonoBehaviour
         for (int i = 0; i < CipherDialogueLines.Length; i++)
         {
             dialogueStep = i;
-            yield return new WaitForSeconds(2.0f);
+            yield return new WaitForSecondsRealtime(2.5f);
         }
+
+        // All Cipher dialogue lines are complete. Start countdown and auto-exit
+        autoExitCountdown = 5.0f;
+        while (autoExitCountdown > 0f)
+        {
+            yield return new WaitForSecondsRealtime(0.2f);
+            autoExitCountdown -= 0.2f;
+        }
+
+        QuitApplication();
+    }
+
+    public void QuitApplication()
+    {
+        Debug.Log("[Stage4UI] Final level completed and all messages displayed. Exiting game.");
+#if UNITY_EDITOR
+        UnityEditor.EditorApplication.isPlaying = false;
+#else
+        Application.Quit();
+#endif
     }
 
     // =====================================================================
@@ -430,50 +464,51 @@ public class Stage4UI : MonoBehaviour
         headerStyle = new GUIStyle(GUI.skin.label);
         headerStyle.fontSize = 15;
         headerStyle.fontStyle = FontStyle.Bold;
-        headerStyle.normal.textColor = new Color(0.6f, 0.8f, 1f);
+        headerStyle.normal.textColor = Color.white;
 
         objStyle = new GUIStyle(GUI.skin.box);
         objStyle.fontSize = 14;
         objStyle.fontStyle = FontStyle.Bold;
         objStyle.alignment = TextAnchor.MiddleLeft;
         objStyle.padding = new RectOffset(12, 10, 6, 6);
-        objStyle.normal.textColor = ColorNormal;
+        objStyle.normal.textColor = Color.white;
 
         timerStyle = new GUIStyle(GUI.skin.box);
         timerStyle.fontSize = 20;
         timerStyle.fontStyle = FontStyle.Bold;
         timerStyle.alignment = TextAnchor.MiddleCenter;
-        timerStyle.normal.textColor = ColorNormal;
+        timerStyle.normal.textColor = Color.white;
 
         bannerStyle = new GUIStyle(GUI.skin.box);
         bannerStyle.fontSize = 18;
         bannerStyle.fontStyle = FontStyle.Bold;
         bannerStyle.alignment = TextAnchor.MiddleCenter;
+        bannerStyle.normal.textColor = Color.white;
 
         escapeTitleStyle = new GUIStyle(GUI.skin.label);
         escapeTitleStyle.fontSize = 36;
         escapeTitleStyle.fontStyle = FontStyle.Bold;
         escapeTitleStyle.alignment = TextAnchor.MiddleCenter;
-        escapeTitleStyle.normal.textColor = ColorSuccess;
+        escapeTitleStyle.normal.textColor = Color.white;
 
         escapeSubStyle = new GUIStyle(GUI.skin.label);
         escapeSubStyle.fontSize = 22;
         escapeSubStyle.fontStyle = FontStyle.Bold;
         escapeSubStyle.alignment = TextAnchor.MiddleCenter;
-        escapeSubStyle.normal.textColor = ColorWarning;
+        escapeSubStyle.normal.textColor = Color.white;
 
         escapeStatStyle = new GUIStyle(GUI.skin.label);
         escapeStatStyle.fontSize = 26;
         escapeStatStyle.fontStyle = FontStyle.Bold;
         escapeStatStyle.alignment = TextAnchor.MiddleCenter;
-        escapeStatStyle.normal.textColor = ColorNormal;
+        escapeStatStyle.normal.textColor = Color.white;
 
         dialogueStyle = new GUIStyle(GUI.skin.label);
         dialogueStyle.fontSize = 20;
         dialogueStyle.fontStyle = FontStyle.Italic;
         dialogueStyle.alignment = TextAnchor.MiddleLeft;
         dialogueStyle.wordWrap = true;
-        dialogueStyle.normal.textColor = new Color(0.7f, 0.95f, 1f);
+        dialogueStyle.normal.textColor = Color.white;
 
         Texture2D darkBg = new Texture2D(1, 1);
         darkBg.SetPixel(0, 0, new Color(0.04f, 0.08f, 0.14f, 0.94f));
@@ -485,27 +520,27 @@ public class Stage4UI : MonoBehaviour
         instrStyle = new GUIStyle(GUI.skin.label);
         instrStyle.fontSize = 14;
         instrStyle.wordWrap = true;
-        instrStyle.normal.textColor = new Color(0.85f, 0.95f, 1f);
+        instrStyle.normal.textColor = Color.white;
 
         briefTitleStyle = new GUIStyle(GUI.skin.label);
         briefTitleStyle.fontSize = 30;
         briefTitleStyle.fontStyle = FontStyle.Bold;
         briefTitleStyle.alignment = TextAnchor.MiddleCenter;
-        briefTitleStyle.normal.textColor = new Color(1f, 0.65f, 0.2f);
+        briefTitleStyle.normal.textColor = Color.white;
 
         briefBodyStyle = new GUIStyle(GUI.skin.label);
         briefBodyStyle.fontSize = 17;
         briefBodyStyle.wordWrap = true;
-        briefBodyStyle.normal.textColor = new Color(0.88f, 0.95f, 1f);
+        briefBodyStyle.normal.textColor = Color.white;
 
         briefHintStyle = new GUIStyle(GUI.skin.label);
         briefHintStyle.fontSize = 14;
         briefHintStyle.alignment = TextAnchor.MiddleCenter;
-        briefHintStyle.normal.textColor = new Color(1f, 0.82f, 0.25f);
+        briefHintStyle.normal.textColor = Color.white;
 
         tinyHintStyle = new GUIStyle(GUI.skin.label);
         tinyHintStyle.fontSize = 12;
-        tinyHintStyle.normal.textColor = new Color(0.6f, 0.75f, 0.9f);
+        tinyHintStyle.normal.textColor = Color.white;
 
         cipherBoxStyle = new GUIStyle(GUI.skin.box);
         cipherBoxStyle.normal.textColor = Color.white;
@@ -513,7 +548,7 @@ public class Stage4UI : MonoBehaviour
         cipherNameStyle = new GUIStyle(GUI.skin.label);
         cipherNameStyle.fontSize = 15;
         cipherNameStyle.fontStyle = FontStyle.Bold;
-        cipherNameStyle.normal.textColor = new Color(0.35f, 1f, 0.45f);
+        cipherNameStyle.normal.textColor = Color.white;
     }
 
     private void OnGUI()
@@ -563,7 +598,7 @@ public class Stage4UI : MonoBehaviour
         // Dynamic Banner Message (Success, Warning, Info)
         if (!string.IsNullOrEmpty(bannerMessage) && Time.unscaledTime < bannerUntil)
         {
-            bannerStyle.normal.textColor = bannerColor;
+            bannerStyle.normal.textColor = Color.white;
             bannerStyle.wordWrap = true;
             float bw = Mathf.Min(600f, Screen.width - 40f);
             float bh = Mathf.Max(42f, bannerStyle.CalcHeight(new GUIContent(bannerMessage), bw - 24f) + 14f);
@@ -688,7 +723,7 @@ public class Stage4UI : MonoBehaviour
         title.fontSize = 64;
         title.fontStyle = FontStyle.Bold;
         title.alignment = TextAnchor.MiddleCenter;
-        title.normal.textColor = new Color(1f, 0.25f, 0.25f);
+        title.normal.textColor = Color.white;
         GUI.Label(new Rect(r.x, r.y + 20f, w, 90f), "GAME OVER", title);
 
         GUIStyle mid = new GUIStyle(GUI.skin.label);
@@ -702,7 +737,7 @@ public class Stage4UI : MonoBehaviour
         body.fontSize = 18;
         body.alignment = TextAnchor.MiddleCenter;
         body.wordWrap = true;
-        body.normal.textColor = new Color(1f, 0.85f, 0.85f);
+        body.normal.textColor = Color.white;
         GUI.Label(new Rect(r.x + 40f, r.y + 170f, w - 80f, 70f),
             "You ran out of time before escaping the Final Control Room. Better luck next time!", body);
 
@@ -710,7 +745,7 @@ public class Stage4UI : MonoBehaviour
         GUIStyle hint = new GUIStyle(GUI.skin.label);
         hint.fontSize = 18;
         hint.alignment = TextAnchor.MiddleCenter;
-        hint.normal.textColor = new Color(1f, 0.82f, 0.25f);
+        hint.normal.textColor = Color.white;
         GUI.Label(new Rect(r.x, r.y + 250f, w, 30f), "Exiting in " + left + "s...", hint);
 
         if (GUI.Button(new Rect(r.x + w * 0.5f - 90f, r.y + 295f, 180f, 40f), "Exit now"))
@@ -753,22 +788,21 @@ public class Stage4UI : MonoBehaviour
         big.fontSize = 52;
         big.fontStyle = FontStyle.Bold;
         big.alignment = TextAnchor.MiddleCenter;
-        float pulse = 0.75f + 0.25f * Mathf.Sin(Time.unscaledTime * 4f);
-        big.normal.textColor = new Color(1f, 0.82f * pulse + 0.1f, 0.2f);
+        big.normal.textColor = Color.white;
         GUI.Label(new Rect(r.x, r.y + 30f, w, 70f), "CONGRATULATIONS!", big);
 
         GUIStyle mid = new GUIStyle(GUI.skin.label);
         mid.fontSize = 24;
         mid.fontStyle = FontStyle.Bold;
         mid.alignment = TextAnchor.MiddleCenter;
-        mid.normal.textColor = ColorSuccess;
+        mid.normal.textColor = Color.white;
         GUI.Label(new Rect(r.x, r.y + 112f, w, 36f), "YOU ESCAPED THE FINAL CONTROL ROOM", mid);
 
         GUIStyle body = new GUIStyle(GUI.skin.label);
         body.fontSize = 18;
         body.alignment = TextAnchor.MiddleCenter;
         body.wordWrap = true;
-        body.normal.textColor = new Color(0.88f, 0.95f, 1f);
+        body.normal.textColor = Color.white;
         GUI.Label(new Rect(r.x + 40f, r.y + 164f, w - 80f, 90f),
             "You cracked the code, rewired the power, survived the security lockdown and walked out through the blast door. Well done, escape artist!",
             body);
@@ -844,14 +878,36 @@ public class Stage4UI : MonoBehaviour
 
         if (dialogueStep >= CipherDialogueLines.Length - 1)
         {
-            GUI.Label(new Rect(contentX, dialogueBoxRect.y + 155f, contentW, 40f), "FACILITY ESCAPED — ALL STAGES CLEARED", escapeSubStyle);
+            GUI.Label(new Rect(contentX, dialogueBoxRect.y + 140f, contentW, 30f), "FACILITY ESCAPED — ALL STAGES CLEARED", escapeSubStyle);
+            int secsLeft = Mathf.Max(1, Mathf.CeilToInt(autoExitCountdown));
+            GUIStyle autoExitStyle = new GUIStyle(GUI.skin.label)
+            {
+                fontSize = 14,
+                fontStyle = FontStyle.Bold,
+                alignment = TextAnchor.MiddleLeft,
+                normal = { textColor = Color.white }
+            };
+            GUI.Label(new Rect(contentX, dialogueBoxRect.y + 172f, contentW, 25f), $"System shutting down. Auto-exiting game in {secsLeft}s...", autoExitStyle);
         }
 
-        if (GUI.Button(new Rect(r.x + w * 0.5f - 90f, r.y + h - 55f, 180f, 40f), "Restart Stage 4"))
+        float btnW = 160f;
+        float btnH = 38f;
+        Rect restartBtnRect = new Rect(r.x + w * 0.5f - btnW - 10f, r.y + h - 50f, btnW, btnH);
+        Rect quitBtnRect = new Rect(r.x + w * 0.5f + 10f, r.y + h - 50f, btnW, btnH);
+
+        if (GUI.Button(restartBtnRect, "Restart Stage 4"))
         {
+            StopAllCoroutines();
             showEscapeScreen = false;
             Stage4TestPlayer.InputLocked = false;
             if (manager != null) manager.RetryStage4();
         }
+
+        GUI.backgroundColor = new Color(0.70f, 0.20f, 0.20f);
+        if (GUI.Button(quitBtnRect, "QUIT NOW [Q]"))
+        {
+            QuitApplication();
+        }
+        GUI.backgroundColor = Color.white;
     }
 }

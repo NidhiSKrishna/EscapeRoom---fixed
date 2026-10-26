@@ -46,10 +46,10 @@ namespace EscapeRoom.Stage2
 
         public string InteractionPrompt => PromptText;
         public string PromptText => isSearched 
-            ? (hasItem ? $"{spotName} (Item Taken)" : $"{spotName} (Empty) - Press E to inspect") 
+            ? (hasItem ? $"{spotName} (Item Taken)" : $"{spotName} (Searched) - Press E to inspect") 
             : $"Press E to search {spotName}";
 
-        public bool CanInteract => canInteract && !HasCollectedTerminalChip;
+        public bool CanInteract => canInteract;
         public int SpotIndex => spotIndex;
 
         private void Awake()
@@ -106,42 +106,39 @@ namespace EscapeRoom.Stage2
         public void Interact()
         {
             var gen = Stage2PuzzleGenerator.Instance;
-            if (isSearched && !hasItem)
-            {
-                string targetHint = (gen != null && gen.ActiveSearchSpot != null)
-                    ? $" (Shift Log points to: {gen.ActiveSearchSpot.spotName})"
-                    : "";
-                FeedbackHUD.ShowMessage($"{spotName} is empty!{targetHint}", new Color(1.0f, 0.82f, 0.35f));
-                return;
-            }
 
-            isSearched = true;
-            Stage2Audio.Instance?.PlayButtonPress();
-
-            // Animate opening if applicable
-            if (animatedPart != null)
+            // Animate opening part if applicable
+            if (!isSearched && animatedPart != null)
             {
                 animatedPart.localPosition += openOffset;
             }
+            isSearched = true;
 
-            if (gen != null && gen.ValidSearchSpotIndex == spotIndex && !HasCollectedTerminalChip)
+            if (!HasCollectedTerminalChip)
             {
+                // Retrieve the security chip from ANY place searched
                 itemCollected = true;
                 hasItem = true;
-                gen.RegisterChipFound();
+                if (gen != null)
+                {
+                    gen.RegisterChipFound();
+                }
+
+                if (EscapeRoom.Interaction.InventorySystem.Instance != null && !EscapeRoom.Interaction.InventorySystem.Instance.HasItem("security_chip"))
+                {
+                    EscapeRoom.Interaction.InventorySystem.Instance.AddItem("security_chip", "Terminal Security Chip", "Security access chip required to boot the Pattern Terminal.");
+                }
+
                 Stage2Audio.Instance?.PlayItemPickup();
-                FeedbackHUD.ShowMessage("FOUND: [Terminal Security Chip]! Insert into the Pattern Terminal on the work table.", new Color(0.35f, 0.95f, 0.40f));
+                FeedbackHUD.ShowMessage($"FOUND in {spotName}: [Terminal Security Chip]! Insert into the Pattern Terminal on the table.", new Color(0.35f, 0.95f, 0.40f));
                 EscapeRoom.Core.ObjectiveManager.Instance?.CompleteFlag("ITEM_FOUND");
-                Debug.Log($"[Stage2SearchSpot] Player found Terminal Security Chip at '{spotName}'.");
+                Debug.Log($"<color=#5cb85c>[Stage2SearchSpot]</color> Player retrieved Terminal Security Chip from '{spotName}'.");
             }
             else
             {
                 hasItem = false;
-                string targetHint = (gen != null && gen.ActiveSearchSpot != null)
-                    ? $" (Shift Log target: {gen.ActiveSearchSpot.spotName})"
-                    : "";
-                FeedbackHUD.ShowMessage($"{spotName} is empty! Nothing useful here.{targetHint}", new Color(1.0f, 0.82f, 0.35f));
-                Debug.Log($"[Stage2SearchSpot] Player searched empty spot: '{spotName}'. Active spot is '{gen?.ActiveSearchSpot?.spotName}'.");
+                Stage2Audio.Instance?.PlayButtonPress();
+                FeedbackHUD.ShowMessage($"{spotName} (Searched) — You already retrieved the Terminal Security Chip!", new Color(1.0f, 0.82f, 0.35f));
             }
         }
     }

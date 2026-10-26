@@ -65,6 +65,24 @@ namespace EscapeRoom.Puzzle
         public string InteractionPrompt => isSolved ? solvedPrompt : InputConfig.FormatPrompt("Use Keypad Terminal");
         public bool CanInteract => !isSolved && gameObject.activeInHierarchy;
 
+        private void Awake()
+        {
+            EnsureRandomizedCode();
+        }
+
+        public void EnsureRandomizedCode()
+        {
+            if (EscapeRoom.Core.PlaythroughGameState.Instance != null)
+            {
+                EscapeRoom.Core.PlaythroughGameState.Instance.EnsureInitialized();
+                targetCode = EscapeRoom.Core.PlaythroughGameState.Instance.Passcode;
+            }
+            else if (string.IsNullOrEmpty(targetCode) || targetCode == "8431")
+            {
+                targetCode = UnityEngine.Random.Range(1000, 10000).ToString("D4");
+            }
+        }
+
         public void Interact()
         {
             if (isSolved) return;
@@ -92,12 +110,17 @@ namespace EscapeRoom.Puzzle
         {
             if (isSolved) return true;
 
-            string expectedCode = !string.IsNullOrEmpty(TargetCode) ? TargetCode : "8431";
-            if (string.Equals(enteredCode, expectedCode, StringComparison.Ordinal) || string.Equals(enteredCode, "8431", StringComparison.Ordinal))
+            string expectedCode = TargetCode;
+            if (string.IsNullOrEmpty(expectedCode))
+            {
+                expectedCode = targetCode;
+            }
+
+            if (string.Equals(enteredCode, expectedCode, StringComparison.Ordinal))
             {
                 isSolved = true;
                 Debug.Log($"<color=#5cb85c><b>[KeypadController]</b></color> Correct code entered on '{gameObject.name}'! Access Granted.");
-                FeedbackHUD.ShowMessage("Keypad: ACCESS GRANTED - Exit Door Unlocked!", new Color(0.40f, 0.95f, 0.45f));
+                FeedbackHUD.ShowMessage("Keypad: ACCESS GRANTED - Exit Door Unlocked!", Color.white);
                 
                 if (linkedDoor != null)
                 {
@@ -111,7 +134,7 @@ namespace EscapeRoom.Puzzle
             else
             {
                 Debug.Log($"<color=#d9534f><b>[KeypadController]</b></color> Incorrect code '{enteredCode}' on '{gameObject.name}'. Target code is {targetCode.Length} digits.");
-                FeedbackHUD.ShowMessage("Keypad: ACCESS DENIED - Incorrect Code!", new Color(0.95f, 0.35f, 0.35f));
+                FeedbackHUD.ShowMessage("Keypad: ACCESS DENIED - Incorrect Code!", Color.white);
                 onCodeRejected?.Invoke();
                 return false;
             }

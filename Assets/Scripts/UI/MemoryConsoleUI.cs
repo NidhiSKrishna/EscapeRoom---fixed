@@ -100,7 +100,7 @@ namespace EscapeRoom.UI
             var hintStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 12, alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.85f, 0.85f, 0.85f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(px + 10, py + 42, pw - 20, 22),
                 $"Memorise the safe path ({Mathf.CeilToInt(autoHideTimer)}s). Bottom row = entrance.", hintStyle);

@@ -84,7 +84,8 @@ namespace EscapeRoom.Interaction
                 isCollected = true;
                 Debug.Log($"<color=#5cb85c><b>[PickupItem]</b></color> Successfully collected '{ItemDisplayName}'.");
 
-                // Play pickup sound
+                // Play pickup sound (2D UI audio for clarity + 3D spatial)
+                EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.KeyPickup);
                 EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                     EscapeRoom.Audio.EscapeRoomAudio.SoundId.KeyPickup,
                     transform.position);

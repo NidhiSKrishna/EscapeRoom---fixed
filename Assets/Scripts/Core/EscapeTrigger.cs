@@ -48,6 +48,9 @@ namespace EscapeRoom.Core
             hasTriggered = true;
             Debug.Log($"<color=#5cb85c><b>[EscapeTrigger]</b></color> Player entered escape trigger volume '{gameObject.name}'.");
 
+            // Play celebratory level exit sound
+            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.LevelExit);
+
             if (GameManager.Instance != null)
             {
                 GameManager.Instance.CompleteEscape();

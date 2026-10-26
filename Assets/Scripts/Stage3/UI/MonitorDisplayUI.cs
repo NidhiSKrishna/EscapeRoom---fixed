@@ -28,7 +28,7 @@ namespace EscapeRoom.Stage3.UI
 
         [Header("Monitor Style")]
         [Tooltip("Color of the monitor title text.")]
-        [SerializeField] private Color titleColor = new Color(0.35f, 0.95f, 0.95f);
+        [SerializeField] private Color titleColor = Color.white;
 
         [Tooltip("Color of the monitor body text.")]
         [SerializeField] private Color textColor = Color.white;
@@ -200,7 +200,7 @@ namespace EscapeRoom.Stage3.UI
                 fontSize = 19,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = titleColor }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 20, cardY + 18, cardW - 40, 30), monitorTitle, monTitleStyle);
 
@@ -233,7 +233,7 @@ namespace EscapeRoom.Stage3.UI
                     fontStyle = FontStyle.Normal,
                     alignment = TextAnchor.UpperLeft,
                     wordWrap = true,
-                    normal = { textColor = new Color(0.70f, 0.95f, 0.65f) }
+                    normal = { textColor = Color.white }
                 };
                 GUI.Label(new Rect(cardX + 30, cardY + 245, cardW - 60, 85), secondaryText, secStyle);
             }
@@ -243,7 +243,7 @@ namespace EscapeRoom.Stage3.UI
             {
                 fontSize = 12,
                 alignment = TextAnchor.MiddleLeft,
-                normal = { textColor = new Color(0.60f, 0.70f, 0.75f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(cardX + 25, cardY + cardH - 36, cardW - 130, 24), "[ESC] / [E] / [SPACE] to close", closeStyle);
 

@@ -204,7 +204,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = isOverdue ? new Color(0.98f, 0.25f, 0.25f) : new Color(0.98f, 0.85f, 0.30f) }
+                normal = { textColor = Color.white }
             };
 
             string timerString = isOverdue 

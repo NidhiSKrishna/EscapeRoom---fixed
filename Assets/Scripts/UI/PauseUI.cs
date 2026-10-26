@@ -51,6 +51,7 @@ namespace EscapeRoom.UI
             bool restartPressed = false;
             bool menuPressed = false;
             bool resumePressed = false;
+            bool quitPressed = false;
 
             var kb = Keyboard.current;
             if (kb != null)
@@ -63,9 +64,13 @@ namespace EscapeRoom.UI
                 {
                     menuPressed = true;
                 }
-                else if (kb.spaceKey.wasPressedThisFrame)
+                else if (kb.spaceKey.wasPressedThisFrame || kb.escapeKey.wasPressedThisFrame)
                 {
                     resumePressed = true;
+                }
+                else if (kb.qKey.wasPressedThisFrame)
+                {
+                    quitPressed = true;
                 }
             }
 
@@ -81,6 +86,10 @@ namespace EscapeRoom.UI
             {
                 OnMainMenuClicked();
             }
+            else if (quitPressed)
+            {
+                OnQuitClicked();
+            }
         }
 
         public void ShowPauseMenu()
@@ -95,15 +104,24 @@ namespace EscapeRoom.UI
             isOpen = false;
         }
 
-        private void OnResumeClicked()
+        public void OnResumeClicked()
         {
             if (PauseManager.Instance != null)
             {
                 PauseManager.Instance.ResumeGame();
             }
+            else
+            {
+                Time.timeScale = 1f;
+                HidePauseMenu();
+                Cursor.lockState = CursorLockMode.Locked;
+                Cursor.visible = false;
+                var look = FindAnyObjectByType<EscapeRoom.Player.PlayerLook>();
+                if (look != null) look.SetCursorLock(true);
+            }
         }
 
-        private void OnRestartClicked()
+        public void OnRestartClicked()
         {
             if (PauseManager.Instance != null)
             {
@@ -121,7 +139,7 @@ namespace EscapeRoom.UI
             }
         }
 
-        private void OnMainMenuClicked()
+        public void OnMainMenuClicked()
         {
             if (PauseManager.Instance != null)
             {
@@ -139,6 +157,17 @@ namespace EscapeRoom.UI
             }
         }
 
+        public void OnQuitClicked()
+        {
+            Debug.Log("[PauseUI] QUIT GAME requested.");
+            Time.timeScale = 1f;
+#if UNITY_EDITOR
+            UnityEditor.EditorApplication.isPlaying = false;
+#else
+            Application.Quit();
+#endif
+        }
+
         private void OnGUI()
         {
             if (!isOpen) return;
@@ -151,7 +180,7 @@ namespace EscapeRoom.UI
             GUI.DrawTexture(new Rect(0, 0, Screen.width, Screen.height), Texture2D.whiteTexture);
 
             float panelWidth = 340f;
-            float panelHeight = 290f;
+            float panelHeight = 345f;
             float panelX = (Screen.width - panelWidth) * 0.5f;
             float panelY = (Screen.height - panelHeight) * 0.5f;
 
@@ -174,20 +203,21 @@ namespace EscapeRoom.UI
                 fontSize = 24,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.95f, 0.95f, 0.95f) }
+                normal = { textColor = Color.white }
             };
-            GUI.Label(new Rect(panelX, panelY + 22f, panelWidth, 36), "PAUSED", titleStyle);
+            GUI.Label(new Rect(panelX, panelY + 20f, panelWidth, 34), "PAUSED", titleStyle);
 
             // Buttons
             float btnW = 230f;
-            float btnH = 42f;
+            float btnH = 40f;
             float btnX = panelX + (panelWidth - btnW) * 0.5f;
-            float startY = panelY + 76f;
-            float spacing = 52f;
+            float startY = panelY + 66f;
+            float spacing = 50f;
 
-            Rect resumeRect = new Rect(btnX, startY, btnW, btnH);
+            Rect resumeRect  = new Rect(btnX, startY, btnW, btnH);
             Rect restartRect = new Rect(btnX, startY + spacing, btnW, btnH);
-            Rect menuRect = new Rect(btnX, startY + spacing * 2f, btnW, btnH);
+            Rect menuRect    = new Rect(btnX, startY + spacing * 2f, btnW, btnH);
+            Rect quitRect    = new Rect(btnX, startY + spacing * 3f, btnW, btnH);
 
             GUIStyle btnStyle = new GUIStyle(GUI.skin.button)
             {
@@ -220,6 +250,13 @@ namespace EscapeRoom.UI
                 OnMainMenuClicked();
             }
 
+            // QUIT GAME
+            GUI.backgroundColor = new Color(0.70f, 0.20f, 0.20f);
+            if (GUI.Button(quitRect, "QUIT GAME [Q]", btnStyle))
+            {
+                OnQuitClicked();
+            }
+
             // Direct Mouse Click Fallback
             Event e = Event.current;
             if (e != null && e.type == EventType.MouseDown && e.button == 0)
@@ -237,6 +274,11 @@ namespace EscapeRoom.UI
                 else if (menuRect.Contains(e.mousePosition))
                 {
                     OnMainMenuClicked();
+                    e.Use();
+                }
+                else if (quitRect.Contains(e.mousePosition))
+                {
+                    OnQuitClicked();
                     e.Use();
                 }
             }

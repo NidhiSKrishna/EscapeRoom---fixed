@@ -83,8 +83,17 @@ namespace EscapeRoom.UI
             KeypadController keypad = FindAnyObjectByType<KeypadController>();
             string code = (keypad != null && !string.IsNullOrEmpty(keypad.TargetCode))
                 ? keypad.TargetCode
-                : "8431";
+                : (EscapeRoom.Core.PlaythroughGameState.Instance != null && !string.IsNullOrEmpty(EscapeRoom.Core.PlaythroughGameState.Instance.Passcode)
+                    ? EscapeRoom.Core.PlaythroughGameState.Instance.Passcode
+                    : "8431");
 
+            // Allow the 3D lockbox lid hinge swing and clue note elevation animation to be watched before the UI modal fades in
+            StartCoroutine(DelayedShowCode(code, 0.85f));
+        }
+
+        private IEnumerator DelayedShowCode(string code, float delay)
+        {
+            yield return new WaitForSeconds(delay);
             ShowCode(code);
         }
 

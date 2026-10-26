@@ -279,16 +279,15 @@ namespace EscapeRoom.UI
             );
 
             // Status text.
-            GUI.color = statusColor;
+            GUI.color = Color.white;
 
             GUIStyle statusStyle = new GUIStyle(GUI.skin.label)
             {
                 fontSize = 12,
                 fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.UpperCenter
+                alignment = TextAnchor.UpperCenter,
+                normal = { textColor = Color.white }
             };
-
-            statusStyle.normal.textColor = statusColor;
 
             GUI.Label(
                 new Rect(panelX + 25f, panelY + 24f, panelWidth - 50f, 20f),
@@ -311,10 +310,9 @@ namespace EscapeRoom.UI
             {
                 fontSize = 24,
                 fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
             };
-
-            digitStyle.normal.textColor = Color.white;
 
             GUI.Label(
                 new Rect(panelX + 25f, panelY + 44f, panelWidth - 50f, 45f),
@@ -343,7 +341,8 @@ namespace EscapeRoom.UI
             {
                 fontSize = 18,
                 fontStyle = FontStyle.Bold,
-                alignment = TextAnchor.MiddleCenter
+                alignment = TextAnchor.MiddleCenter,
+                normal = { textColor = Color.white }
             };
 
             for (int i = 0; i < buttons.Length; i++)
@@ -391,7 +390,7 @@ namespace EscapeRoom.UI
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.9f, 0.9f, 0.9f) }
+                normal = { textColor = Color.white }
             };
 
             if (GUI.Button(

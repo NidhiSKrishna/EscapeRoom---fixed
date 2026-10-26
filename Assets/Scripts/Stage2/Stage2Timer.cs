@@ -246,19 +246,7 @@ namespace EscapeRoom.Stage2
             Color oldColor = GUI.color;
 
             // Determine text color based on urgency
-            Color timeColor;
-            if (remainingTime <= 30f)
-            {
-                timeColor = new Color(0.95f, 0.30f, 0.30f); // Red (< 30s)
-            }
-            else if (remainingTime <= 90f)
-            {
-                timeColor = new Color(0.98f, 0.75f, 0.25f); // Amber (< 1.5 min)
-            }
-            else
-            {
-                timeColor = Color.white;
-            }
+            Color timeColor = Color.white;
 
             // Dark sleek backdrop
             GUI.color = new Color(0.05f, 0.06f, 0.09f, 0.85f);
@@ -275,7 +263,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 9,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleLeft,
-                normal = { textColor = new Color(0.65f, 0.75f, 0.85f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(panelX + 10, panelY + 4, panelW - 14, 16), "TIME REMAINING", subtitleStyle);
 
@@ -328,7 +316,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 20,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(1f, 0.95f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             GUI.color = Color.white;
             GUI.Label(new Rect(winX + 10, winY + 12, winW - 20, 26f), "✖ YOU HAVE BEEN CAUGHT", titleStyle);
@@ -338,7 +326,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 11,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(1f, 0.55f, 0.55f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 10, winY + 38, winW - 20, 18f), "TIME LIMIT EXPIRED // FACILITY CONTAINMENT PROTOCOL ENGAGED", subStyle);
 
@@ -353,7 +341,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 13,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(1f, 0.85f, 0.40f) }
+                normal = { textColor = Color.white }
             };
             GUI.color = Color.white;
             GUI.Label(new Rect(winX + 30, curY + 10, winW - 60, 20f), "SECURITY INCIDENT REPORT", statHeaderStyle);
@@ -375,7 +363,7 @@ namespace EscapeRoom.Stage2
                 fontSize = 12,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.95f, 0.35f, 0.35f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(winX + 30, curY + 146, winW - 60, 22f), "MISSION FAILED: You failed to escape before time expired.", alertStyle);
 

@@ -185,7 +185,7 @@ namespace EscapeRoom.UI
         {
             Debug.Log("[MainMenuUI] QUIT requested.");
 #if UNITY_EDITOR
-            Debug.Log("<color=#f0ad4e>[MainMenuUI]</color> Quit requested in Editor Play Mode.");
+            UnityEditor.EditorApplication.isPlaying = false;
 #else
             Application.Quit();
 #endif
@@ -230,7 +230,7 @@ namespace EscapeRoom.UI
                 fontSize = 14,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.75f, 0.80f, 0.88f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(panelX + 20, panelY + 26, panelWidth - 40, 22), "WELCOME TO", subTitleStyle);
 
@@ -240,7 +240,7 @@ namespace EscapeRoom.UI
                 fontSize = 32,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.98f, 0.85f, 0.35f) }
+                normal = { textColor = Color.white }
             };
             GUI.Label(new Rect(panelX + 20, panelY + 50, panelWidth - 40, 44), "ESCAPE ROOM", titleStyle);
 
@@ -257,7 +257,7 @@ namespace EscapeRoom.UI
                 fontSize = 12,
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = currentStage > 1 ? new Color(0.40f, 0.95f, 0.60f) : new Color(0.75f, 0.85f, 0.95f) }
+                normal = { textColor = Color.white }
             };
             string progressText = currentStage > 1
                 ? $"SAVED PROGRESS: {GameProgress.GetStageDisplayName(currentStage).ToUpper()}"
@@ -287,7 +287,7 @@ namespace EscapeRoom.UI
                 fontStyle = FontStyle.Bold,
                 alignment = TextAnchor.MiddleCenter,
                 normal = { textColor = Color.white },
-                hover = { textColor = new Color(1f, 1f, 0.75f) },
+                hover = { textColor = Color.white },
                 active = { textColor = Color.white }
             };
 
@@ -322,7 +322,7 @@ namespace EscapeRoom.UI
                 fontSize = 14,
                 fontStyle = FontStyle.Normal,
                 alignment = TextAnchor.MiddleCenter,
-                normal = { textColor = new Color(0.85f, 0.88f, 0.92f) }
+                normal = { textColor = Color.white }
             };
 
             GUI.backgroundColor = new Color(0.24f, 0.26f, 0.32f, 1f);

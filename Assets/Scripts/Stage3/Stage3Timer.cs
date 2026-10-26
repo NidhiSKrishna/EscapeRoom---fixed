@@ -21,8 +21,8 @@ namespace EscapeRoom.Stage3
 
         private GUIStyle timerStyle;
         private Color normalColor = Color.white;
-        private Color warningColor = new Color(0.95f, 0.85f, 0.25f);
-        private Color dangerColor = new Color(0.95f, 0.35f, 0.35f);
+        private Color warningColor = Color.white;
+        private Color dangerColor = Color.white;
 
         private void Awake()
         {
