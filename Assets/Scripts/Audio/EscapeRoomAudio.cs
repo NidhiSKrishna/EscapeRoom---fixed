@@ -45,7 +45,7 @@ namespace EscapeRoom.Audio
             KeypadWrong,        // Buzzer / error
             KeypadCorrect,      // Access-granted two-tone
             DoorUnlock,         // Heavy bolt clunk
-            DoorOpen,           // Heavy door swing, creaking hinge, and thud
+            DoorOpen,           // Subtle, smooth door swing and soft latch release
             ObjectBump,         // Subtle thud
             LevelExit,          // Triumphant level clear victory fanfare & transition swell
         }
@@ -343,76 +343,82 @@ namespace EscapeRoom.Audio
             return Clip("KeypadCorrect", Append(Append(t1, silence), t2));
         }
 
-        // 8. Door Unlock — heavy mechanical clunk
+                // 8. Door Unlock - subtle metallic bolt slide
         private static AudioClip CreateDoorUnlock()
         {
-            float duration = 0.28f;
+            float duration = 0.22f;
             int n = Mathf.FloorToInt(SR * duration);
             float[] s = new float[n];
+            float lpf = 0f;
             for (int i = 0; i < n; i++)
             {
                 float t   = (float)i / SR;
-                float env = Mathf.Exp(-t * 18f) * 0.70f;
-                float noise = (UnityEngine.Random.value * 2f - 1f) * 0.40f;
-                // Heavy bolt click (420Hz) + low mechanical thud (110Hz)
-                s[i] = env * (Mathf.Sin(2f * Mathf.PI * 110f * t) * 0.6f + Mathf.Sin(2f * Mathf.PI * 420f * t) * 0.4f + noise);
+                float env = Mathf.Exp(-t * 28f) * 0.35f;
+                float white = UnityEngine.Random.value * 2f - 1f;
+                lpf += 0.08f * (white - lpf);
+                // Subtle mechanical click and slide
+                float tone = Mathf.Sin(2f * Mathf.PI * 140f * t) * 0.6f + Mathf.Sin(2f * Mathf.PI * 320f * t) * 0.4f;
+                s[i] = env * (tone + lpf * 0.30f);
             }
             return Clip("DoorUnlock", s);
         }
 
-        // 9. Door Open — full 1.4s door swing: bolt release, rich resonant hinge creak, air whoosh & stop thud
+        // 9. Door Open - subtle, smooth door opening: gentle latch release, warm low hinge whisper and soft air glide
         private static AudioClip CreateDoorOpen()
         {
-            float duration = 1.40f;
+            float duration = 0.90f;
             int n = Mathf.FloorToInt(SR * duration);
             float[] s = new float[n];
+            float lpf = 0f;
 
             for (int i = 0; i < n; i++)
             {
                 float t = (float)i / SR;
                 float sample = 0f;
 
-                // Phase 1 (0.00 - 0.22s): Initial bolt unlatch and mechanical clack
-                if (t < 0.22f)
+                // Low-pass filtered noise for smooth, velvet-like air and friction (no harsh hiss)
+                float white = UnityEngine.Random.value * 2f - 1f;
+                lpf += 0.06f * (white - lpf); // ~420Hz one-pole LPF
+
+                // Phase 1 (0.00 - 0.12s): Very soft latch disengagement click
+                if (t < 0.12f)
                 {
-                    float env = Mathf.Exp(-t * 22f) * 0.60f;
-                    float clunk = Mathf.Sin(2f * Mathf.PI * 130f * t) * 0.5f + Mathf.Sin(2f * Mathf.PI * 460f * t) * 0.4f;
-                    float noise = (UnityEngine.Random.value * 2f - 1f) * 0.35f;
-                    sample += env * (clunk + noise);
+                    float latchEnv = Mathf.Exp(-t * 36f) * 0.28f;
+                    float click = Mathf.Sin(2f * Mathf.PI * 180f * t) * 0.6f + Mathf.Sin(2f * Mathf.PI * 340f * t) * 0.4f;
+                    sample += latchEnv * (click + lpf * 0.35f);
                 }
 
-                // Phase 2 (0.18 - 1.15s): Slow heavy door creak (rich harmonics & friction)
-                if (t >= 0.18f && t < 1.15f)
+                // Phase 2 (0.06 - 0.78s): Subtle, warm wooden/brass hinge glide and soft air displacement
+                if (t >= 0.06f && t < 0.78f)
                 {
-                    float tCreak = t - 0.18f;
-                    float creakDur = 0.97f;
-                    float creakProg = tCreak / creakDur;
-                    float creakEnv = Mathf.Sin(creakProg * Mathf.PI) * 0.55f;
+                    float tGlide = t - 0.06f;
+                    float glideDur = 0.72f;
+                    float prog = tGlide / glideDur;
+                    float glideEnv = Mathf.Sin(prog * Mathf.PI);
 
-                    // Wood/iron friction harmonics with rhythmic creak modulation
-                    float wobble = 1f + 0.15f * Mathf.Sin(2f * Mathf.PI * 7.5f * tCreak);
-                    float f1 = (Mathf.Lerp(280f, 410f, creakProg) + Mathf.Sin(2f * Mathf.PI * 14f * tCreak) * 20f) * wobble;
-                    float f2 = f1 * 1.55f;
-                    float f3 = f1 * 2.1f;
+                    // Low warm fundamental (125Hz -> 155Hz), very gentle and mellow
+                    float freq = Mathf.Lerp(125f, 155f, prog);
+                    float warmTone = Mathf.Sin(2f * Mathf.PI * freq * tGlide) * 0.14f
+                                   + Mathf.Sin(2f * Mathf.PI * (freq * 1.5f) * tGlide) * 0.06f;
 
-                    float tone = Mathf.Sin(2f * Mathf.PI * f1 * tCreak) * 0.40f
-                               + Mathf.Sin(2f * Mathf.PI * f2 * tCreak) * 0.28f
-                               + Mathf.Sin(2f * Mathf.PI * f3 * tCreak) * 0.18f;
-                    float noise = (UnityEngine.Random.value * 2f - 1f) * 0.15f;
+                    // Soft velvety air whoosh
+                    float airWhoosh = lpf * 0.10f;
 
-                    sample += creakEnv * (tone + noise);
+                    sample += glideEnv * (warmTone + airWhoosh);
                 }
 
-                // Phase 3 (1.10 - 1.40s): Door reaches fully open stop with a satisfying settle thump
-                if (t >= 1.10f)
+                // Phase 3 (0.70 - 0.90s): Gentle, damped soft stop settle
+                if (t >= 0.70f)
                 {
-                    float tStop = t - 1.10f;
-                    float stopEnv = Mathf.Exp(-tStop * 18f) * 0.55f;
-                    float stopThump = Mathf.Sin(2f * Mathf.PI * 90f * tStop) * 0.7f + Mathf.Sin(2f * Mathf.PI * 220f * tStop) * 0.3f;
-                    sample += stopEnv * stopThump;
+                    float tStop = t - 0.70f;
+                    float stopEnv = Mathf.Exp(-tStop * 22f) * 0.16f;
+                    float stopThud = Mathf.Sin(2f * Mathf.PI * 85f * tStop);
+                    sample += stopEnv * stopThud;
                 }
 
-                s[i] = Mathf.Clamp(sample, -1f, 1f);
+                // Edge smoothing at start and end to guarantee zero clicks
+                float edge = Mathf.Clamp01(t / 0.005f) * Mathf.Clamp01((duration - t) / 0.015f);
+                s[i] = Mathf.Clamp(sample * edge, -1f, 1f);
             }
             return Clip("DoorOpen", s);
         }

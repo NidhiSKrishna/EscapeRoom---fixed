@@ -1,4 +1,4 @@
-using System.Collections;
+﻿using System.Collections;
 using UnityEngine;
 using UnityEngine.Events;
 using EscapeRoom.Interaction;
@@ -128,11 +128,11 @@ namespace EscapeRoom.Puzzle
             isLocked = false;
             Debug.Log($"<color=#5cb85c><b>[DoorController]</b></color> '{gameObject.name}' unlocked!");
 
-            // ── Door unlock sound ─────────────────────────────────────────────
-            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorUnlock);
+            // ── Door unlock sound: subtle spatial audio ─────────────────────────
             EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                 EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorUnlock,
-                transform.position);
+                transform.position,
+                0.50f);
 
             FeedbackHUD.ShowMessage("Exit Door Unlocked!", Color.white);
             onDoorUnlocked?.Invoke();
@@ -165,11 +165,11 @@ namespace EscapeRoom.Puzzle
                 StopCoroutine(swingCoroutine);
             }
 
-            // ── Door open sound: 2D reinforcement + 3D spatial ────────────────
-            EscapeRoom.Audio.EscapeRoomAudio.Play(EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorOpen);
+            // ── Door open sound: subtle spatial audio ──────────────────────────
             EscapeRoom.Audio.EscapeRoomAudio.PlayAt(
                 EscapeRoom.Audio.EscapeRoomAudio.SoundId.DoorOpen,
-                transform.position);
+                transform.position,
+                0.55f);
 
             // Ensure doorway transition light
             EnsureDoorwayLight();
