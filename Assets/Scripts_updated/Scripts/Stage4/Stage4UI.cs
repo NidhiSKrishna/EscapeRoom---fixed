@@ -30,12 +30,26 @@ public class Stage4UI : MonoBehaviour
     [Header("Instruction timing (seconds)")]
     [Tooltip("Mission briefing shown once, when the stage first starts.")]
     [SerializeField] private float briefingSeconds = 15f;
+    [Tooltip("How long the Stage title and Objective box stay visible after each task is completed (seconds).")]
+    [SerializeField] private float objectiveDisplaySeconds = 4f;
     [Tooltip("Keypad (objective 5) instructions stay on screen at least this long.")]
     [SerializeField] private float codeInstructionSeconds = 20f;
     [Tooltip("HOW TO PLAY box for the other objectives.")]
     [SerializeField] private float defaultInstructionSeconds = 10f;
     [Tooltip("How long the box shows when the player presses H.")]
     [SerializeField] private float helpKeySeconds = 15f;
+
+    [Header("Cipher Dialogue timing")]
+    [Tooltip("How long Cipher dialogue popups stay on screen (seconds).")]
+    [SerializeField] private float cipherDialogueSeconds = 5f;
+
+    [Header("Sequence Delays (staggers UI boxes so they do not overlap)")]
+    [Tooltip("Pause after a puzzle modal closes before showing the solved / digit reminder banner (seconds).")]
+    [SerializeField] private float delayBeforeBanner = 0.4f;
+    [Tooltip("Pause between banner ending and Cipher dialogue starting (seconds).")]
+    [SerializeField] private float delayBeforeCipher = 0.4f;
+    [Tooltip("Pause between Cipher dialogue ending and HOW TO PLAY box starting (seconds).")]
+    [SerializeField] private float delayBeforeInstruction = 0.4f;
 
     [Header("Congratulations screen")]
     [Tooltip("How long the CONGRATULATIONS screen stays before the Cipher ending appears.")]
@@ -64,6 +78,7 @@ public class Stage4UI : MonoBehaviour
     private static readonly Color ColorWarning = new Color(1f, 0.82f, 0.25f); // #FFD23F
 
     private string currentObjective = "OBJECTIVE: Access Pattern Terminal";
+    private float objectiveUntil = 0f;
     private string currentInstruction = "HOW TO PLAY: Press E on the Pattern Terminal. Figure out the number sequence pattern and submit the missing number.";
     private float instructionUntil = 0f;
     private bool briefingShown = false;
@@ -97,14 +112,35 @@ public class Stage4UI : MonoBehaviour
     private GUIStyle escapeTitleStyle, escapeSubStyle, escapeStatStyle, dialogueStyle;
     private GUIStyle cipherBoxStyle, cipherNameStyle;
 
+    public static Stage4UI Instance { get; private set; }
+
+    public static bool IsAnyOverlayBlocking
+    {
+        get
+        {
+            if (Instance != null)
+            {
+                if (Instance.BriefingVisible) return true;
+                if (Instance.showEscapeScreen || Instance.showGameOver) return true;
+            }
+            return false;
+        }
+    }
+
     private void Awake()
     {
+        Instance = this;
         if (manager == null) manager = FindFirstObjectByType<Stage4Manager>();
         if (timerAdapter == null) timerAdapter = FindFirstObjectByType<Stage4TimerAdapter>();
         if (lockdown == null) lockdown = FindFirstObjectByType<Stage4SecurityLockdown>();
         if (integrationAdapter == null) integrationAdapter = FindFirstObjectByType<Stage4IntegrationAdapter>();
 
         LoadCipherPortrait();
+    }
+
+    private void OnDestroy()
+    {
+        if (Instance == this) Instance = null;
     }
 
     private void LoadCipherPortrait()
@@ -144,6 +180,12 @@ public class Stage4UI : MonoBehaviour
 
     private void OnDisable()
     {
+        if (stateSequenceCoroutine != null)
+        {
+            StopCoroutine(stateSequenceCoroutine);
+            stateSequenceCoroutine = null;
+        }
+
         if (manager != null)
         {
             manager.OnStateChanged -= HandleStateChanged;
@@ -160,12 +202,17 @@ public class Stage4UI : MonoBehaviour
 
     public void ShowCipherDialogue(string message)
     {
+        ShowCipherDialogue(message, cipherDialogueSeconds);
+    }
+
+    public void ShowCipherDialogue(string message, float seconds)
+    {
         if (EscapeRoom.UI.CipherHostUI.Instance != null)
         {
-            EscapeRoom.UI.CipherHostUI.Instance.ShowMessage(message, 5.5f);
+            EscapeRoom.UI.CipherHostUI.Instance.ShowMessage(message, seconds);
         }
         cipherActiveDialogue = message;
-        cipherDialogueUntil = Time.unscaledTime + 5.5f;
+        cipherDialogueUntil = Time.unscaledTime + seconds;
     }
 
     public void ShowInstruction(string instruction)
@@ -191,16 +238,39 @@ public class Stage4UI : MonoBehaviour
         get { return !string.IsNullOrEmpty(currentInstruction) && Time.unscaledTime < instructionUntil; }
     }
 
+    private bool BannerVisible
+    {
+        get { return !string.IsNullOrEmpty(bannerMessage) && Time.unscaledTime < bannerUntil; }
+    }
+
+    private bool CipherDialogueVisible
+    {
+        get { return !string.IsNullOrEmpty(cipherActiveDialogue) && Time.unscaledTime < cipherDialogueUntil; }
+    }
+
+    /// <summary>Shows the Stage title + Objective box now, for objectiveDisplaySeconds.</summary>
+    private void QueueObjectiveDisplay()
+    {
+        objectiveUntil = Time.unscaledTime + objectiveDisplaySeconds;
+    }
+
     private void Update()
     {
         Keyboard keyboard = Keyboard.current;
         if (keyboard != null)
         {
-            // H = show the current instructions again (for example the keypad code recipe).
+            // Allow dismissing the Mission Briefing early so the player can start playing immediately
+            if (BriefingVisible && (keyboard.spaceKey.wasPressedThisFrame || keyboard.enterKey.wasPressedThisFrame || keyboard.eKey.wasPressedThisFrame))
+            {
+                briefingUntil = 0f;
+            }
+
+            // H = show the current instructions and objective again
             if (keyboard.hKey.wasPressedThisFrame && !string.IsNullOrEmpty(lastInstruction))
             {
                 currentInstruction = lastInstruction;
                 instructionUntil = Time.unscaledTime + helpKeySeconds;
+                QueueObjectiveDisplay();
             }
             if (showEscapeScreen && keyboard.qKey.wasPressedThisFrame)
             {
@@ -240,71 +310,223 @@ public class Stage4UI : MonoBehaviour
                "Press E on the Keypad to enter it. Press H to read this again.";
     }
 
+    private Coroutine stateSequenceCoroutine = null;
+
+    private void TriggerStateSequence(
+        string objectiveText,
+        string instructionText,
+        float instructionDuration,
+        string bannerFallback,
+        string digitReminderText,
+        string cipherText,
+        bool isStartBriefing = false)
+    {
+        if (stateSequenceCoroutine != null)
+        {
+            StopCoroutine(stateSequenceCoroutine);
+            stateSequenceCoroutine = null;
+        }
+        stateSequenceCoroutine = StartCoroutine(StateSequenceRoutine(
+            objectiveText,
+            instructionText,
+            instructionDuration,
+            bannerFallback,
+            digitReminderText,
+            cipherText,
+            isStartBriefing));
+    }
+
+    private IEnumerator StateSequenceRoutine(
+        string objectiveText,
+        string instructionText,
+        float instructionDuration,
+        string bannerFallback,
+        string digitReminderText,
+        string cipherText,
+        bool isStartBriefing)
+    {
+        // 1. Immediately update the main Objective banner
+        if (!string.IsNullOrEmpty(objectiveText))
+        {
+            ShowObjective(objectiveText);
+        }
+
+        // Cache the instruction so pressing H works at any moment
+        if (!string.IsNullOrEmpty(instructionText))
+        {
+            lastInstruction = instructionText;
+        }
+
+        // 2. Initial Mission Briefing (first start only)
+        if (isStartBriefing && !briefingShown)
+        {
+            briefingShown = true;
+            briefingUntil = Time.unscaledTime + briefingSeconds;
+            // Clear any old popups while briefing is active
+            HideMessage();
+            cipherActiveDialogue = "";
+            cipherDialogueUntil = 0f;
+            currentInstruction = "";
+            instructionUntil = 0f;
+
+            while (BriefingVisible)
+            {
+                yield return null;
+            }
+            yield return new WaitForSecondsRealtime(0.2f);
+            QueueObjectiveDisplay();
+        }
+
+        // 3. Result / Digit Reminder Banner (if any)
+        if (!string.IsNullOrEmpty(digitReminderText) || !string.IsNullOrEmpty(bannerFallback))
+        {
+            // Wait until any active interactive puzzle modal (e.g. Pattern sequence terminal) has fully closed
+            while (Stage4TestPlayer.InputLocked)
+            {
+                yield return null;
+            }
+
+            if (delayBeforeBanner > 0f)
+            {
+                yield return new WaitForSecondsRealtime(delayBeforeBanner);
+            }
+
+            // Task completed: show the stage title and new objective box
+            QueueObjectiveDisplay();
+
+            ShowDigitBanner(bannerFallback, digitReminderText);
+            while (Time.unscaledTime < bannerUntil)
+            {
+                yield return null;
+            }
+            if (delayBeforeCipher > 0f)
+            {
+                yield return new WaitForSecondsRealtime(delayBeforeCipher);
+            }
+        }
+
+        // 4. Cipher Dialogue popup (if any)
+        if (!string.IsNullOrEmpty(cipherText))
+        {
+            ShowCipherDialogue(cipherText, cipherDialogueSeconds);
+            while (Time.unscaledTime < cipherDialogueUntil)
+            {
+                yield return null;
+            }
+            if (delayBeforeInstruction > 0f)
+            {
+                yield return new WaitForSecondsRealtime(delayBeforeInstruction);
+            }
+        }
+
+        // 5. "HOW TO PLAY" Box
+        if (!string.IsNullOrEmpty(instructionText))
+        {
+            ShowInstruction(instructionText, instructionDuration);
+        }
+
+        stateSequenceCoroutine = null;
+    }
+
     private void HandleStateChanged(Stage4State state)
     {
         switch (state)
         {
             case Stage4State.PatternPuzzle:
-                ShowObjective("OBJECTIVE 1/5: Analyze & Solve Pattern Recognition Terminal");
-                ShowInstruction("HOW TO PLAY: Press E on the Pattern Terminal. Figure out the number sequence pattern and submit the missing number (0-9). Your answer is DIGIT 1 of the final keypad code.");
-                if (!briefingShown)
-                {
-                    // First start of the game: show the mission briefing first, then the normal instruction.
-                    briefingShown = true;
-                    briefingUntil = Time.unscaledTime + briefingSeconds;
-                    instructionUntil += briefingSeconds;
-                }
-                ShowCipherDialogue("\"Access the Pattern Terminal. Discover the mathematical sequence rule to begin unlocking the system.\"");
+                TriggerStateSequence(
+                    objectiveText: "OBJECTIVE 1/5: Analyze & Solve Pattern Recognition Terminal",
+                    instructionText: "HOW TO PLAY: Press E on the Pattern Terminal. Figure out the number sequence pattern and submit the missing number (0-9). Your answer is DIGIT 1 of the final keypad code.",
+                    instructionDuration: defaultInstructionSeconds,
+                    bannerFallback: null,
+                    digitReminderText: null,
+                    cipherText: "\"Access the Pattern Terminal. Discover the mathematical sequence rule to begin unlocking the system.\"",
+                    isStartBriefing: true
+                );
                 break;
 
             case Stage4State.MemoryPuzzle:
-                ShowObjective("OBJECTIVE 2/5: Replay & Verify Memory Sequence Lights");
-                ShowInstruction("HOW TO PLAY: Press E on any colored button to watch the light sequence flash with sound. Then press the colored buttons in the exact same order. The colour number of the LAST light (Red 1, Blue 2, Green 3, Yellow 4) is DIGIT 2 of the keypad code. Also remember the FIRST light.");
-                ShowDigitBanner("Pattern Solved! Memory Terminal Unlocked.", DigitTextAfterPattern());
-                ShowCipherDialogue("\"Memory station active. Press E on the panel to watch the lights flash, then repeat the exact color sequence.\"");
+                TriggerStateSequence(
+                    objectiveText: "OBJECTIVE 2/5: Replay & Verify Memory Sequence Lights",
+                    instructionText: "HOW TO PLAY: Press E on any colored button to watch the light sequence flash with sound. Then press the colored buttons in the exact same order. The colour number of the LAST light (Red 1, Blue 2, Green 3, Yellow 4) is DIGIT 2 of the keypad code. Also remember the FIRST light.",
+                    instructionDuration: defaultInstructionSeconds,
+                    bannerFallback: "Pattern Solved! Memory Terminal Unlocked.",
+                    digitReminderText: DigitTextAfterPattern(),
+                    cipherText: "\"Memory station active. Press E on the panel to watch the lights flash, then repeat the exact color sequence.\""
+                );
                 break;
 
             case Stage4State.ControlPanel:
-                ShowObjective("OBJECTIVE 3/5: Identify & Authorize Matching Control Console");
-                ShowInstruction("HOW TO PLAY: Recall the 1st light color that flashed in the Memory Puzzle. Find the console (A, B, C or D) showing that colour and press E. That console's number (A=1, B=2, C=3, D=4) is DIGIT 3 of the keypad code.");
-                ShowDigitBanner("Memory Verified! Control Consoles Activated.", DigitTextAfterMemory());
-                ShowCipherDialogue("\"Think back to the FIRST light color in the memory sequence. Authorize the console that matches it.\"");
+                TriggerStateSequence(
+                    objectiveText: "OBJECTIVE 3/5: Identify & Authorize Matching Control Console",
+                    instructionText: "HOW TO PLAY: Recall the 1st light color that flashed in the Memory Puzzle. Find the console (A, B, C or D) showing that colour and press E. That console's number (A=1, B=2, C=3, D=4) is DIGIT 3 of the keypad code.",
+                    instructionDuration: defaultInstructionSeconds,
+                    bannerFallback: "Memory Verified! Control Consoles Activated.",
+                    digitReminderText: DigitTextAfterMemory(),
+                    cipherText: "\"Think back to the FIRST light color in the memory sequence. Authorize the console that matches it.\""
+                );
                 break;
 
             case Stage4State.PathPuzzle:
-                ShowObjective("OBJECTIVE 4/5: Rewire the Power Junction Box");
-                ShowInstruction("HOW TO PLAY: Press E on the Junction Box. Connect the terminals from the LOWEST to the HIGHEST voltage. The number of the terminal you connect LAST is DIGIT 4 of the keypad code.");
-                ShowDigitBanner("Console Authorized! Wiring Panel Online.", DigitTextAfterPanel());
-                ShowCipherDialogue("\"The power lines are scrambled. Open the Junction Box and reconnect them from the lowest voltage to the highest. A wrong wire shorts the circuit.\"");
+                TriggerStateSequence(
+                    objectiveText: "OBJECTIVE 4/5: Rewire the Power Junction Box",
+                    instructionText: "HOW TO PLAY: Press E on the Junction Box. Connect the terminals from the LOWEST to the HIGHEST voltage. The number of the terminal you connect LAST is DIGIT 4 of the keypad code.",
+                    instructionDuration: defaultInstructionSeconds,
+                    bannerFallback: "Console Authorized! Wiring Panel Online.",
+                    digitReminderText: DigitTextAfterPanel(),
+                    cipherText: "\"The power lines are scrambled. Open the Junction Box and reconnect them from the lowest voltage to the highest. A wrong wire shorts the circuit.\""
+                );
                 break;
 
             case Stage4State.CodePuzzle:
-                ShowObjective("OBJECTIVE 5/5: Enter 4-Digit Security Keypad Code");
-                ShowInstruction(BuildCodeInstruction(), codeInstructionSeconds);
-                ShowDigitBanner("Power Restored! Security Keypad Ready.", DigitTextAfterWires());
-                ShowCipherDialogue("\"The final override code is built from all your puzzle results. Check your recipe clues if you need help.\"");
+                TriggerStateSequence(
+                    objectiveText: "OBJECTIVE 5/5: Enter 4-Digit Security Keypad Code",
+                    instructionText: BuildCodeInstruction(),
+                    instructionDuration: codeInstructionSeconds,
+                    bannerFallback: "Power Restored! Security Keypad Ready.",
+                    digitReminderText: DigitTextAfterWires(),
+                    cipherText: "\"The final override code is built from all your puzzle results. Check your recipe clues if you need help.\""
+                );
                 break;
 
             case Stage4State.FinalOverride:
-                ShowObjective("FINAL STAGE: Initiate Central Override at Control Terminal");
-                ShowInstruction("HOW TO PLAY: Press E on the Central Terminal and confirm all 5 override steps. Prepare for emergency alarm!");
-                ShowSuccess("Keypad Accepted! Central Terminal Authorized.");
-                ShowCipherDialogue("\"Central terminal unlocked! Execute the override sequence, but stay ready for whatever security throws at us.\"");
+                TriggerStateSequence(
+                    objectiveText: "FINAL STAGE: Initiate Central Override at Control Terminal",
+                    instructionText: "HOW TO PLAY: Press E on the Central Terminal and confirm all 5 override steps. Prepare for emergency alarm!",
+                    instructionDuration: defaultInstructionSeconds,
+                    bannerFallback: "Keypad Accepted! Central Terminal Authorized.",
+                    digitReminderText: null,
+                    cipherText: "\"Central terminal unlocked! Execute the override sequence, but stay ready for whatever security throws at us.\""
+                );
                 break;
 
             case Stage4State.Lockdown:
+                if (stateSequenceCoroutine != null)
+                {
+                    StopCoroutine(stateSequenceCoroutine);
+                    stateSequenceCoroutine = null;
+                }
                 ShowObjective("CRITICAL: Complete Emergency Actions & Escape!");
-                ShowInstruction("HOW TO PLAY: 30 SECONDS LEFT! Run to the 3 Emergency Stations (Power, Matrix, Auth) and press E on each. When all 3 turn green, the exit door opens: walk through it to escape!");
                 ShowWarning("SECURITY LOCKDOWN TRIGGERED!");
+                ShowInstruction("HOW TO PLAY: 30 SECONDS LEFT! Run to the 3 Emergency Stations (Power, Matrix, Auth) and press E on each. When all 3 turn green, the exit door opens: walk through it to escape!");
                 ShowCipherDialogue("\"EMERGENCY LOCKDOWN! Activate all three emergency stations right now before the clock runs out!\"");
                 break;
 
             case Stage4State.Escaped:
+                if (stateSequenceCoroutine != null)
+                {
+                    StopCoroutine(stateSequenceCoroutine);
+                    stateSequenceCoroutine = null;
+                }
                 ShowObjective("FACILITY ACCESS OVERRIDE SUCCESSFUL");
                 ShowInstruction("STATUS: Blast door breached. Facility successfully escaped.");
                 break;
 
             case Stage4State.Failed:
+                if (stateSequenceCoroutine != null)
+                {
+                    StopCoroutine(stateSequenceCoroutine);
+                    stateSequenceCoroutine = null;
+                }
                 ShowObjective("GAME OVER - TIME EXPIRED");
                 StartGameOver();
                 break;
@@ -313,6 +535,11 @@ public class Stage4UI : MonoBehaviour
 
     private void HandleEscapeCompleted()
     {
+        if (stateSequenceCoroutine != null)
+        {
+            StopCoroutine(stateSequenceCoroutine);
+            stateSequenceCoroutine = null;
+        }
         showEscapeScreen = true;
         dialogueStep = 0;
         congratsUntil = Time.unscaledTime + congratsSeconds;
@@ -325,6 +552,11 @@ public class Stage4UI : MonoBehaviour
 
     private void HandleStageReset()
     {
+        if (stateSequenceCoroutine != null)
+        {
+            StopCoroutine(stateSequenceCoroutine);
+            stateSequenceCoroutine = null;
+        }
         showEscapeScreen = false;
         showGameOver = false;
         gameOverExited = false;
@@ -332,6 +564,13 @@ public class Stage4UI : MonoBehaviour
         dialogueStep = 0;
         autoExitCountdown = -1f;
         Stage4TestPlayer.InputLocked = false;
+        briefingShown = false;
+        briefingUntil = 0f;
+        currentInstruction = "";
+        instructionUntil = 0f;
+        objectiveUntil = 0f;
+        cipherActiveDialogue = "";
+        cipherDialogueUntil = 0f;
         HideMessage();
     }
 
@@ -444,7 +683,13 @@ public class Stage4UI : MonoBehaviour
 
     public void ShowObjective(string message)
     {
+        ShowObjective(message, objectiveDisplaySeconds);
+    }
+
+    public void ShowObjective(string message, float seconds)
+    {
         currentObjective = message;
+        objectiveUntil = Time.unscaledTime + seconds;
     }
 
     public void HideMessage()
@@ -563,16 +808,33 @@ public class Stage4UI : MonoBehaviour
 
         if (showEscapeScreen)
         {
+            // Draw in front of every other box and hide whatever is behind (e.g. "All stations engaged")
+            GUI.depth = -1000;
+            Color oldColor = GUI.color;
+            GUI.color = new Color(0.02f, 0.04f, 0.08f, 1f);
+            GUI.DrawTexture(new Rect(0f, 0f, Screen.width, Screen.height), Texture2D.whiteTexture);
+            GUI.color = oldColor;
+            
             if (Time.unscaledTime < congratsUntil) RenderCongratulations();
             else RenderEscapeScreen();
             return;
         }
 
-        // HUD Top Banner
-        GUI.Label(new Rect(18, 12, 350, 24), "STAGE 4 — FINAL CONTROL ROOM", headerStyle);
+        float marginX = 28f;
+        float marginY = 22f;
 
-        // Objective box
-        GUI.Box(new Rect(16, 36, 520, 36), currentObjective, objStyle);
+        bool showObjectiveHUD = Time.unscaledTime < objectiveUntil;
+
+        // Stage Title and Objective Box: shown for objectiveDisplaySeconds (default 4s) after task completion / objective change
+        if (showObjectiveHUD)
+        {
+            // HUD Top Banner
+            GUI.Label(new Rect(marginX, marginY, 350f, 22f), "STAGE 4 — FINAL CONTROL ROOM", headerStyle);
+
+            // Objective box (responsive width with comfortable padding from window borders)
+            float maxObjW = Mathf.Min(520f, Screen.width * 0.55f);
+            GUI.Box(new Rect(marginX, marginY + 24f, maxObjW, 38f), currentObjective, objStyle);
+        }
 
         // Mission briefing (start of the game) or the HOW TO PLAY box
         if (BriefingVisible)
@@ -581,33 +843,40 @@ public class Stage4UI : MonoBehaviour
         }
         else if (InstructionVisible)
         {
-            RenderInstruction();
+            // Always placed below the top area, so it never sits on top of the Cipher message box.
+            RenderInstruction(marginX, marginY);
         }
         else if (manager != null && manager.GetCurrentState() != Stage4State.NotStarted)
         {
-            GUI.Label(new Rect(18f, 74f, 360f, 20f), "Press H to show the instructions", tinyHintStyle);
+            float hintY = showObjectiveHUD ? (marginY + 68f) : marginY;
+            GUI.Label(new Rect(marginX, hintY, 360f, 20f), "Press H to show the instructions", tinyHintStyle);
         }
 
-        // Timer HUD (Top Right)
+        // Timer HUD (Top Right - safe 28px margin from right edge and 22px from top edge)
         if (timerAdapter != null)
         {
             string timeStr = timerAdapter.GetFormattedTime();
-            GUI.Box(new Rect(Screen.width - 140, 16, 122, 40), "TIME " + timeStr, timerStyle);
+            float timerW = 130f;
+            float timerH = 40f;
+            float timerX = Screen.width - timerW - marginX;
+            float timerY = marginY;
+            GUI.Box(new Rect(timerX, timerY, timerW, timerH), "TIME " + timeStr, timerStyle);
         }
 
         // Dynamic Banner Message (Success, Warning, Info)
-        if (!string.IsNullOrEmpty(bannerMessage) && Time.unscaledTime < bannerUntil)
+        if (BannerVisible)
         {
             bannerStyle.normal.textColor = Color.white;
             bannerStyle.wordWrap = true;
-            float bw = Mathf.Min(600f, Screen.width - 40f);
+            float bw = Mathf.Min(600f, Screen.width - 80f);
             float bh = Mathf.Max(42f, bannerStyle.CalcHeight(new GUIContent(bannerMessage), bw - 24f) + 14f);
-            Rect br = new Rect((Screen.width - bw) * 0.5f, 85f, bw, bh);
+            Rect br = new Rect((Screen.width - bw) * 0.5f, marginY + 68f, bw, bh);
             GUI.Box(br, bannerMessage, bannerStyle);
         }
 
         // Cipher Active In-Game Dialogue / Hint Box
-        if (!string.IsNullOrEmpty(cipherActiveDialogue) && Time.unscaledTime < cipherDialogueUntil)
+        // If CipherHostUI is active in the scene, it handles Cipher dialogue to avoid duplicate overlapping boxes.
+        if (EscapeRoom.UI.CipherHostUI.Instance == null && CipherDialogueVisible)
         {
             RenderCipherDialoguePopup();
         }
@@ -625,15 +894,15 @@ public class Stage4UI : MonoBehaviour
 
         int left = Mathf.CeilToInt(briefingUntil - Time.unscaledTime);
         GUI.Label(new Rect(r.x, r.y + h - 38f, w, 26f),
-            "Closes in " + left + "s   |   Press H at any time to see the instructions again", briefHintStyle);
+            "Press SPACE or E to start now (" + left + "s)   |   Press H at any time for help", briefHintStyle);
     }
 
-    private void RenderInstruction()
+    private void RenderInstruction(float x = 28f, float y = 90f)
     {
-        float w = 370f;
+        float w = Mathf.Min(370f, Screen.width * 0.45f);
         float textW = w - 24f;
         float textH = instrStyle.CalcHeight(new GUIContent(currentInstruction), textW);
-        Rect r = new Rect(16f, 76f, w, textH + 18f);
+        Rect r = new Rect(x, y, w, textH + 18f);
 
         GUI.Box(r, GUIContent.none, instrBoxStyle);
         GUI.Label(new Rect(r.x + 12f, r.y + 9f, textW, textH), currentInstruction, instrStyle);
